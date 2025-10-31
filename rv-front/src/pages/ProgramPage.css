@@ -1,0 +1,211 @@
+.program-page {
+  font-family: 'Ubuntu', sans-serif;
+  background: #FFFFFF;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Breadcrumbs */
+.breadcrumbs-section {
+  width: 100%;
+}
+
+/* Actions Section */
+.actions-section {
+  padding: 0 1.5%;
+}
+
+.remove-btn {
+  background: rgb(220, 53, 69);
+  border: 1px solid #DDDEE1;
+  color: #fff;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 18px;
+  height: 35px;
+  padding: 0 1rem;
+}
+
+.remove-btn:hover {
+  background: rgb(200, 35, 51);
+}
+
+/* Init Values Section */
+.init-values-section {
+  padding: 1rem 1.5%;
+  margin-top: 1rem;
+}
+
+.section-caption {
+  font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.init-inputs {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.init-inputs label {
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 400;
+  display: inline-block;
+  width: 44px;
+  text-align: right;
+  margin: 0;
+}
+
+.init-input {
+  height: 28px;
+  width: 72px;
+  border: 1px solid #000;
+  font-family: 'Ubuntu', sans-serif;
+  padding: 0 8px;
+}
+
+/* Commands Section */
+.commands-section {
+  padding: 2rem 1.5%;
+  width: 100%;
+}
+
+.table-header {
+  display: flex;
+  width: 100%;
+  margin: 0;
+}
+
+.table-column-name {
+  background: #F0F1F2;
+  border: 1px solid #DDDEE1;
+  width: 164px;
+  height: 97px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+}
+
+.column-name-text {
+  font-weight: 500;
+  font-size: 16px;
+  margin: 0;
+}
+
+.command-row {
+  display: flex;
+  width: 100%;
+  margin: 0;
+}
+
+.table-cell {
+  box-sizing: border-box;
+  width: 164px;
+  height: 99px;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #DDDEE1;
+  padding: 0;
+  margin: 0;
+}
+
+.command-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.cell-text {
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  margin: 0;
+}
+
+.operand-input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  text-align: center;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 16px;
+  padding: 0 8px;
+}
+
+.operand-input:focus {
+  outline: none;
+  background-color: #f8f9fa;
+}
+
+/* Results Section */
+.results-section {
+  padding: 1rem 1.5%;
+}
+
+.result-box {
+  box-sizing: border-box;
+  width: 683px;
+  height: 102px;
+  font-family: 'Ubuntu', sans-serif;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #DDDEE1;
+  font-size: 16px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .table-column-name,
+  .table-cell {
+    width: 140px;
+  }
+  
+  .result-box {
+    width: 100%;
+    max-width: 683px;
+  }
+}
+
+@media (max-width: 992px) {
+  .commands-section {
+    overflow-x: auto;
+  }
+  
+  .table-header,
+  .command-row {
+    min-width: 984px; /* 164px * 6 */
+  }
+}
+
+@media (max-width: 768px) {
+  .init-inputs {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .init-inputs label {
+    text-align: left;
+  }
+  
+  .breadcrumbs-section,
+  .actions-section,
+  .init-values-section,
+  .commands-section,
+  .results-section {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}

@@ -1,0 +1,24 @@
+/* #root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+} */
+
+.breadcrumbs-section {
+  margin-top: 1%;
+}
+
+.commands-btn {
+    border-radius: 0px;
+    border: 0px;
+    background: rgb(0,50,98);
+    color: #fff;
+    border-bottom: 1px solid #DDDEE1;
+    text-decoration: underline;
+}
+
+.commands-btn:hover {
+    background: rgb(51,91,129);
+    color: #fff;
+}

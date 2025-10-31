@@ -1,0 +1,225 @@
+.commands-page {
+  font-family: 'Ubuntu', sans-serif;
+  background: #FFFFFF;
+  min-height: 100vh;
+  width: 100vw;
+}
+
+/* Custom Navbar - ЗАНИМАЕТ ВСЮ ШИРИНУ */
+.custom-navbar {
+  background: #FFFFFF;
+  border-bottom: 1px solid #DDDEE1;
+  padding: 0.5rem 0;
+  width: 100%;
+}
+
+.navbar-container {
+  padding: 0 1.5%;
+}
+
+.custom-brand {
+  padding: 0;
+}
+
+.logo-image {
+  height: 24px;
+}
+
+/* Navigation Section - ЗАНИМАЕТ ВСЮ ШИРИНУ */
+.navigation-section {
+  margin-top: 1%;
+  padding: 0 1.5%;
+  width: 100%;
+}
+
+.navigation-row {
+  width: 100%;
+  margin: 0;
+}
+
+/* Search Form - РАСШИРЕННЫЙ */
+.custom-search-form {
+  width: 60%;
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.custom-search-input {
+  width: 100%;
+  height: 40px;
+  font-family: 'Ubuntu', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 16px;
+  color: #000;
+  padding: 0px 12px 0px 30px;
+  border: 2px solid rgb(95, 95, 105);
+  border-radius: 5px;
+  background-color: transparent;
+}
+
+.custom-search-input:focus {
+  box-shadow: none;
+  border-color: #DDDEE1;
+  background-color: transparent;
+}
+
+.mag-glass {
+  background-image: url("data:image/svg+xml, %3Csvg width='19' height='19' viewBox='0 0 19 19' fill='none' xmlns='http://www.w3.org/2000/svg' class='mag_glass_vector'%3E%3Cpath d='M12.5048 12.5171L16.625 16.625M14.25 8.3125C14.25 11.5917 11.5917 14.25 8.3125 14.25C5.03331 14.25 2.375 11.5917 2.375 8.3125C2.375 5.03331 5.03331 2.375 8.3125 2.375C11.5917 2.375 14.25 5.03331 14.25 8.3125Z' stroke='%236B6E76' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-size: 13px;
+  background-repeat: no-repeat;
+  background-position: 10px center;
+}
+
+.custom-search-btn {
+  height: 40px;
+  background: rgb(0,50,98);
+  border: none;
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 18px;
+  border-radius: 4px;
+}
+
+.custom-search-btn:hover {
+  background: rgb(51,91,129);
+}
+
+.custom-search-btn:disabled {
+  background: #6B6E76;
+}
+
+/* Cart Icon */
+.cart-col {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 17px;
+}
+
+.cart-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #FFFFFF;
+  border: 2px solid #000000;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.commands-container {
+  padding: 40px 1.5%;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.commands-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 300px);
+  gap: 57px;
+  justify-content: center;
+}
+
+.command-card-wrapper {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.loading-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 100%;
+}
+
+.no-commands {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #6B6E76;
+  padding: 3rem 0;
+}
+
+/* Адаптация для разных разрешений */
+@media (min-width: 1200px) {
+  .commands-grid {
+    grid-template-columns: repeat(3, 300px);
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+  .commands-grid {
+    grid-template-columns: repeat(2, 300px);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .commands-grid {
+    grid-template-columns: repeat(2, 300px);
+    gap: 30px;
+  }
+}
+
+@media (max-width: 767px) {
+  .commands-grid {
+    grid-template-columns: 300px;
+    gap: 20px;
+  }
+  
+  .cart-col {
+    justify-content: center;
+    margin-top: 15px;
+  }
+}
+
+/* Responsive для навигации */
+@media (max-width: 768px) {
+  .navigation-section {
+    margin-top: 2%;
+  }
+  
+  .custom-search-form .row {
+    flex-direction: column;
+  }
+  
+  .custom-search-form .col {
+    width: 100%;
+  }
+  
+  .commands-container {
+    padding: 20px 1.5%;
+  }
+  
+  .navigation-row {
+    justify-content: center !important;
+  }
+}
+
+/* Обеспечиваем полную ширину для всех контейнеров */
+.container-fluid {
+  padding-left: 1.5%;
+  padding-right: 1.5%;
+}
