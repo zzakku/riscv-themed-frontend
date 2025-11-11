@@ -21,19 +21,22 @@ interface CommandsPageProps {
   programID?: string;
 }
 
-export const CommandsPage: FC<CommandsPageProps> = ({ 
-  cartCount = 0, 
+export const CommandsPage: FC<CommandsPageProps> = ({  
   programID = "" 
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [commands, setCommands] = useState<Command[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+//const [programID, setProgramID] = useState(-1);
+
 
   const navigate = useNavigate();
 
   useEffect(() => {
     loadCommands();
+    loadCartCount();
   }, []);
 
   const loadCommands = async (query: string = "") => {
@@ -80,6 +83,13 @@ export const CommandsPage: FC<CommandsPageProps> = ({
       navigate(`/program/${programID}`);
     }
   };
+
+  const loadCartCount = async () => {
+    //try {
+    // Вызов API будет здесь позже 
+    //}
+      setCartCount(0);
+  }
 
   return (
     <div className="commands-page">
@@ -129,7 +139,7 @@ export const CommandsPage: FC<CommandsPageProps> = ({
             </Form>
           </Col>
           
-          {/* Cart Icon - справа */}
+          {/* Иконка корзины*/}
           <Col xs="auto" className="cart-col">
             <div 
               className="cart-icon-wrapper" 
