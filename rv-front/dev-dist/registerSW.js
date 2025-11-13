@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/riscv-themed-frontend/dev-sw.js?dev-sw', { scope: '/riscv-themed-frontend/', type: 'classic' })
