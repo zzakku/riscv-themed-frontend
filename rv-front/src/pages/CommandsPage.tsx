@@ -98,49 +98,74 @@ export const CommandsPage: FC<CommandsPageProps> = ({
 
       <Container fluid className="navigation-section">
         <BreadCrumbs crumbs={[{ label: ROUTE_LABELS.COMMANDS }]} />
-        <Row className="justify-content-between align-items-center navigation-row">
-          <Col xs={12} lg={9} xl={10}>
+        <Row 
+  className="justify-content-between align-items-center navigation-row"
+  style={{
+    display: 'flex',
+    flexWrap: 'nowrap',
+    alignItems: 'center',
+    gap: '10px',
+    width: '100%'
+  }}
+>
+          {/* Поиск и кнопка - слева */}
+          <Col 
+            xs={12} 
+            md={8} 
+            lg={9} 
+            xl={10}
+            style={{
+              flex: '1 1 auto',
+              minWidth: '0',
+              overflow: 'hidden'
+            }}
+          >
             <Form onSubmit={handleSearch} className="custom-search-form">
-              <Row className="g-2 align-items-center">
-                <Col xs={12} md={8} lg={9}>
-                  <div className="search-input-wrapper">
-                    <Form.Control
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Поиск"
-                      className="custom-search-input mag-glass"
-                      disabled={searchLoading}
-                    />
-                  </div>
-                </Col>
-                <Col xs={12} md={4} lg={3}>
-                  <Button 
-                    type="submit" 
-                    className="custom-search-btn"
+              <div className="search-fields-wrapper">
+                <div className="search-input-container">
+                  <Form.Control
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Поиск"
+                    className="custom-search-input mag-glass"
                     disabled={searchLoading}
-                  >
-                    {searchLoading ? (
-                      <>
-                        <Spinner
-                          as="span"
-                          animation="border"
-                          size="sm"
-                          role="status"
-                          aria-hidden="true"
-                          className="me-2"
-                        />
-                        Поиск...
-                      </>
-                    ) : "Найти"}
-                  </Button>
-                </Col>
-              </Row>
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  className="custom-search-btn"
+                  disabled={searchLoading}
+                >
+                  {searchLoading ? (
+                    <>
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                        className="me-2"
+                      />
+                      Поиск...
+                    </>
+                  ) : "Найти"}
+                </Button>
+              </div>
             </Form>
           </Col>
           
-          {/* Иконка корзины*/}
-          <Col xs="auto" className="cart-col">
+          {/* Корзина - справа */}
+          <Col 
+            xs={12} 
+            md={4} 
+            lg={3} 
+            xl={2} 
+            className="cart-col-wrapper"
+            style={{
+              flex: '0 0 auto'
+            }}
+          >
             <div 
               className="cart-icon-wrapper" 
               onClick={handleCartClick}

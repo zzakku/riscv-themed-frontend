@@ -4,6 +4,7 @@ import {
   Container, 
   Navbar
 } from "react-bootstrap";
+import { NavLink } from "react-router-dom"
 
 export const Navigation: FC = () => {
 
@@ -17,6 +18,12 @@ export const Navigation: FC = () => {
               alt="logo" 
             />
           </Navbar.Brand>
+          <div className='nav__wrapper'>
+            <div className='nav__links'>
+              <NavLink to='/' className='nav__link'>Главная</NavLink>
+              <NavLink to='/items' className='nav__link'>Товары</NavLink>
+            </div>
+          </div>
         </Container>
       </Navbar>
   );

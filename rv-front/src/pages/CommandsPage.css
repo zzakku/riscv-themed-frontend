@@ -5,7 +5,7 @@
   width: 100vw;
 }
 
-/* Custom Navbar - ЗАНИМАЕТ ВСЮ ШИРИНУ */
+/* Хедер */
 .custom-navbar {
   background: #FFFFFF;
   border-bottom: 1px solid #DDDEE1;
@@ -25,7 +25,7 @@
   height: 24px;
 }
 
-/* Navigation Section - ЗАНИМАЕТ ВСЮ ШИРИНУ */
+/* Сюда помещаем breadcrumbs и поиск с корзиной */
 .navigation-section {
   margin-top: 1%;
   padding: 0 1.5%;
@@ -37,14 +37,21 @@
   margin: 0;
 }
 
-/* Search Form - РАСШИРЕННЫЙ */
+/* Форма поиска */
 .custom-search-form {
-  width: 60%;
+  width: 100%;
 }
 
-.search-input-wrapper {
-  position: relative;
-  width: 100%;
+.search-fields-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 545px; /* Фиксированная максимальная ширина */
+}
+
+/* Поле поиска */
+.search-input-container {
+  flex: 1;
 }
 
 .custom-search-input {
@@ -75,6 +82,7 @@
   background-position: 10px center;
 }
 
+/* Кнопка поиска - компактная */
 .custom-search-btn {
   height: 40px;
   background: rgb(0,50,98);
@@ -84,6 +92,10 @@
   font-size: 16px;
   line-height: 18px;
   border-radius: 4px;
+  white-space: nowrap;
+  padding: 0 20px;
+  min-width: 100px;
+  flex-shrink: 0;
 }
 
 .custom-search-btn:hover {
@@ -94,10 +106,11 @@
   background: #6B6E76;
 }
 
-/* Cart Icon */
-.cart-col {
+/* Корзина - выравнивание по правому краю */
+.cart-col-wrapper {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   padding-right: 17px;
 }
 
@@ -181,6 +194,10 @@
     grid-template-columns: repeat(2, 300px);
     gap: 30px;
   }
+  
+  .search-fields-wrapper {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 767px) {
@@ -189,32 +206,27 @@
     gap: 20px;
   }
   
-  .cart-col {
-    justify-content: center;
-    margin-top: 15px;
+  /* Для мобильных - корзина остается справа в одной строке */
+  .cart-col-wrapper {
+    justify-content: flex-end;
+    padding-right: 0;
+  }
+  
+  .search-fields-wrapper {
+    max-width: 100%;
   }
 }
 
-/* Responsive для навигации */
-@media (max-width: 768px) {
-  .navigation-section {
-    margin-top: 2%;
+/* Только для очень маленьких экранов */
+@media (max-width: 576px) {
+  .custom-search-btn {
+    min-width: 80px;
+    padding: 0 15px;
+    font-size: 14px;
   }
   
-  .custom-search-form .row {
-    flex-direction: column;
-  }
-  
-  .custom-search-form .col {
-    width: 100%;
-  }
-  
-  .commands-container {
-    padding: 20px 1.5%;
-  }
-  
-  .navigation-row {
-    justify-content: center !important;
+  .search-fields-wrapper {
+    gap: 8px;
   }
 }
 
@@ -222,4 +234,47 @@
 .container-fluid {
   padding-left: 1.5%;
   padding-right: 1.5%;
+}
+
+@media (max-width: 767px) {
+  .navigation-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  /* Принудительно переопределяем Bootstrap стили */
+  .navigation-row > Col:first-child {
+    flex: 1 1 0px !important; /* Принудительное сжатие */
+    min-width: 0 !important;
+    max-width: none !important;
+    width: auto !important;
+  }
+  
+  .cart-col-wrapper {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+  
+  .search-fields-wrapper {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+  }
+  
+  .search-input-container {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .custom-search-input {
+    min-width: 0;
+    width: 100%;
+  }
+  
+  .custom-search-btn {
+    flex-shrink: 0;
+  }
 }
