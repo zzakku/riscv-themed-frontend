@@ -4,7 +4,7 @@ import {
   Container, 
   Spinner
 } from "react-bootstrap";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { type Command, getCommandById } from "../modules/commandsApi";
 import { Navigation } from "../components/Navigation";
 import { BreadCrumbs } from "../components/BreadCrumbs";
@@ -13,7 +13,6 @@ import { COMMANDS_MOCK } from "../modules/mock";
 
 export const CommandDetailPage: FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const [command, setCommand] = useState<Command | null>(null);
   const [loading, setLoading] = useState(true);
 

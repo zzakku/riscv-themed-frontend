@@ -1,7 +1,7 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
-import { ROUTES, ROUTE_LABELS } from '../Routes';
+import { ROUTES } from '../Routes';
 import './MainPage.css';
 import { Navigation } from '../components/Navigation';
 import { BreadCrumbs } from '../components/BreadCrumbs';

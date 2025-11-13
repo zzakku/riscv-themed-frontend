@@ -8,7 +8,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 const App: FC = () => {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename = "/riscv-themed-frontend">
       <div className="App">
         <Routes>
           <Route path={ROUTES.HOME} element={<MainPage />} />
