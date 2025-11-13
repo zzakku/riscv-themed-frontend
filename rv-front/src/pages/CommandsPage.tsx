@@ -93,7 +93,7 @@ export const CommandsPage: FC<CommandsPageProps> = ({
 
   return (
     <div className="commands-page">
-      {/* Header с Navbar */}
+      {/* Хедер и навбар */}
       <Navigation />
 
       <Container fluid className="navigation-section">

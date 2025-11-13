@@ -7,6 +7,10 @@
 
 .navbar-container {
   padding: 0 1.5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
 }
 
 .custom-brand {
@@ -15,4 +19,127 @@
 
 .logo-image {
   height: 24px;
+}
+
+.nav__wrapper {
+  display: flex;
+  align-items: center;
+  gap: 35px;
+}
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 35px;
+}
+
+.nav__link {
+  text-decoration: none;
+  color: rgb(0,50,98);
+  position: relative;
+}
+
+.nav__link:hover {
+  color: rgb(51,91,129);
+}
+
+.nav__link--cart {
+  color: rgb(0,50,98);
+  padding: 5px 10px;
+  background-color: #fff;
+  border-radius: 5px;
+  font-weight: 700;
+}
+
+.nav__link.active::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  left: 0;
+  bottom: -7px;
+  background-color: #fff;
+}
+
+/* Мобильное меню */
+.nav__mobile-wrapper {
+  display: none;
+  position: relative;
+}
+
+.nav__mobile-button {
+  height: 30px;
+  width: 30px;
+  transition: all .4s linear;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.nav__mobile-target {
+  height: 1.75px;
+  width: 100%;
+  background-color: black;
+  position: relative;
+  transition: all .2s linear;
+}
+
+.nav__mobile-button.active .nav__mobile-target {
+  transform: rotate(45deg)
+}
+
+.nav__mobile-target::after, .nav__mobile-target::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background-color: black;
+}
+
+.nav__mobile-target::after {
+  top: -7px;
+}
+
+.nav__mobile-target::before {
+  bottom: -7px;
+}
+
+.nav__mobile-button.active .nav__mobile-target::after {
+  display: none;
+}
+
+.nav__mobile-button.active .nav__mobile-target::before {
+  top: 0;
+  transform: rotate(90deg);
+}
+
+.nav__mobile-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  flex-direction: column;
+  gap: 15px;
+  background-color: rgb(246, 178, 25);
+  padding: 20px;
+  min-width: 150px;
+  border-radius: 10px;
+  display: none;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.nav__mobile-button.active + .nav__mobile-menu {
+  display: flex;
+}
+
+@media (max-width: 545px) {
+  .nav__links {
+    display: none;
+  }
+
+  .nav__mobile-wrapper {
+    display: block;
+  }
 }
