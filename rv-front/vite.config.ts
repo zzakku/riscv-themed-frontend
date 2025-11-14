@@ -15,6 +15,11 @@ export default defineConfig({
         target: "http://localhost:8081",
         changeOrigin: true,
       },
+      '/rvimg': {
+        target: 'http://localhost:9000',
+        changeOrigin: true,
+        secure: false,
+      }
     },
 //    watch: { // нужно для hot-reload при использовании docker
 //        usePolling: true,

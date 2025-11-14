@@ -81,7 +81,7 @@ export const getCommandById = async (id: number): Promise<Command> => {
     }
     
     const data = await response.json();
-    return data.reaction || data;
+    return data.data;
   } catch (error) {
     console.error('API Error:', error);
     throw error;
@@ -92,7 +92,7 @@ export const getAllCommands = async (query?: string): Promise<Command[]> => {
   try {
     const url = query 
       ? `${API_BASE}/commands?searchQuery=${query}` 
-      : `${API_BASE}/reaction`;
+      : `${API_BASE}/commands`;
     
     console.log('API Request:', url); 
 
