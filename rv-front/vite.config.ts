@@ -1,13 +1,14 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
+// import { VitePWA } from 'vite-plugin-pwa'
 import mkcert from 'vite-plugin-mkcert'
 import fs from 'fs';
 import path from 'path';
+import { BASE_PATH } from "./src/target_config"
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/riscv-themed-frontend",
+  base: BASE_PATH,
   server: { 
     proxy: {
       "/api": {
@@ -29,30 +30,30 @@ export default defineConfig({
   plugins: [
     react(),
     mkcert(),
-    VitePWA({ 
-      registerType: 'autoUpdate',
-      devOptions: {
-        enabled: true,
-      },
-      manifest: {
-        name: "RISC-V Assembly",
-        short_name: "RISC-V",
-        start_url: "/riscv-themed-frontend/",
-        display: "standalone",
-        background_color: "#fdfdfd",
-        theme_color: "#003262",
-        orientation: "portrait-primary",
-        icons: [
-          {
-      	    "src": "/logo192.png",
-      	    "type": "image/png", "sizes": "192x192"
-          },
-          {
-      	    "src": "/logo512.png",
-      	    "type": "image/png", "sizes": "512x512"
-          }
-        ],
-      }
-    }),
+    // VitePWA({ 
+    //   registerType: 'autoUpdate',
+    //   devOptions: {
+    //     enabled: true,
+    //   },
+    //   manifest: {
+    //     name: "RISC-V Assembly",
+    //     short_name: "RISC-V",
+    //     start_url: "/riscv-themed-frontend/",
+    //     display: "standalone",
+    //     background_color: "#fdfdfd",
+    //     theme_color: "#003262",
+    //     orientation: "portrait-primary",
+    //     icons: [
+    //       {
+    //   	    "src": "/logo192.png",
+    //   	    "type": "image/png", "sizes": "192x192"
+    //       },
+    //       {
+    //   	    "src": "/logo512.png",
+    //   	    "type": "image/png", "sizes": "512x512"
+    //       }
+    //     ],
+    //   }
+    // }),
   ]
 })

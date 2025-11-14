@@ -16,21 +16,24 @@ import { BreadCrumbs } from "../components/BreadCrumbs";
 import { Navigation } from "../components/Navigation";
 import { COMMANDS_MOCK } from "../modules/mock";
 
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { setSearchQuery } from '../store/filterSlice';
+
 interface CommandsPageProps {
-  cartCount?: number;
   programID?: string;
 }
 
 export const CommandsPage: FC<CommandsPageProps> = ({  
   programID = "" 
 }) => {
-  const [searchQuery, setSearchQuery] = useState("");
   const [commands, setCommands] = useState<Command[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [cartCount, setCartCount] = useState(0);
 //const [programID, setProgramID] = useState(-1);
 
+  const dispatch = useAppDispatch();
+  const { searchQuery } = useAppSelector((state) => state.filters)
 
   const navigate = useNavigate();
 
@@ -39,7 +42,7 @@ export const CommandsPage: FC<CommandsPageProps> = ({
     loadCartCount();
   }, []);
 
-  const loadCommands = async (query: string = "") => {
+  const loadCommands = async (query: string = searchQuery) => {
     setLoading(true);
     try {
       const data = await getAllCommands(query);
@@ -63,6 +66,10 @@ export const CommandsPage: FC<CommandsPageProps> = ({
     setSearchLoading(true);
     await loadCommands(searchQuery);
     setSearchLoading(false);
+  };
+
+  const handleSearchChange = (value: string) => {
+    dispatch(setSearchQuery(value));
   };
 
   const handleDetailsClick = (id: number) => {
@@ -126,7 +133,7 @@ export const CommandsPage: FC<CommandsPageProps> = ({
                   <Form.Control
                     type="text"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => handleSearchChange(e.target.value)}
                     placeholder="Поиск"
                     className="custom-search-input mag-glass"
                     disabled={searchLoading}

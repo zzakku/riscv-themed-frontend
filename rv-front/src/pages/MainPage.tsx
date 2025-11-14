@@ -1,10 +1,12 @@
 import { type FC } from 'react';
-import { Link } from 'react-router-dom';
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
-import { ROUTES } from '../Routes';
+// import { Link } from 'react-router-dom';
+import { Container, Row, Col, Card } from 'react-bootstrap';
+// import { ROUTES } from '../Routes';
 import './MainPage.css';
 import { Navigation } from '../components/Navigation';
 import { BreadCrumbs } from '../components/BreadCrumbs';
+
+import { CustomCarousel } from '../components/Carousel';
 
 export const MainPage: FC = () => {
   return (
@@ -32,13 +34,15 @@ export const MainPage: FC = () => {
                   <hr className="divider my-4" />
 
                   <div className="reactions-section">
-                    <h2 className="reactions-title mb-3">Список команд</h2>
+                    {/* <h2 className="reactions-title mb-3">Список команд</h2> */}
                     
-                    <Link to={ROUTES.COMMANDS}>
+                    {/* <Link to={ROUTES.COMMANDS}>
                       <Button variant="primary" size="lg" className="commands-btn">
                         Перейти к списку команд
                       </Button>
-                    </Link>
+                    </Link> */}
+
+                    <CustomCarousel />
                   </div>
                 </Card.Body>
               </Card>

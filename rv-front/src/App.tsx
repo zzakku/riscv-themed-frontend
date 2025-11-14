@@ -5,10 +5,11 @@ import CommandInfoPage from './pages/CommandInfoPage';
 import { ROUTES } from './Routes';
 import { type FC } from "react";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BASE_PATH } from './target_config';
 
 const App: FC = () => {
   return (
-    <BrowserRouter basename = "/riscv-themed-frontend">
+    <BrowserRouter basename = {BASE_PATH}>
       <div className="App">
         <Routes>
           <Route path={ROUTES.HOME} element={<MainPage />} />
