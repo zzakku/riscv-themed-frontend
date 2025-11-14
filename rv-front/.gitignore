@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# HTTPS local cert keys
+ca.key
+cert.key
+
+# Tauri src
+
+src-tauri/
