@@ -1,4 +1,4 @@
-const target_tauri = true; // ПЕРЕКЛЮЧИТЬ, ЕСЛИ МЫ РАБОТАЕМ В TAURI
+const target_tauri = false; // ПЕРЕКЛЮЧИТЬ, ЕСЛИ МЫ РАБОТАЕМ В TAURI
 const target_github_pages = false; // ПЕРЕКЛЮЧИСЬ, ЕСЛИ ТАРГЕТ - GITHUB PAGES
 
 export const API_BASE_URL = target_tauri || target_github_pages

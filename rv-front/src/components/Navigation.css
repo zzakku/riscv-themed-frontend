@@ -143,3 +143,15 @@
     display: block;
   }
 }
+
+.my-btn {
+    background: rgb(0,50,98);
+    color: #fff;
+    border-bottom: 1px solid #DDDEE1;
+    text-decoration: underline;
+}
+
+.my-btn:hover {
+    background: rgb(51,91,129);
+    color: #fff;
+}
