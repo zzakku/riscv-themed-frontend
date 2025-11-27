@@ -6,17 +6,25 @@ import fs from 'fs';
 import path from 'path';
 import { BASE_PATH } from "./src/target_config"
 
+// Для локальной работы:
+
+      // "/api": {
+      //   target: "http//localhost:8081",
+      //   changeOrigin: true,
+      // },
+// Для деплоя где-либо /api не проксируется
+
 // https://vite.dev/config/
 export default defineConfig({
   base: BASE_PATH,
   server: { 
     proxy: {
-      "/api": {
-        target: "http://localhost:8081",
-        changeOrigin: true,
-      },
+      // "/api": {
+      //   target: "https://1afa8552089991.lhr.life",
+      //   changeOrigin: true,
+      // },
       '/rvimg': {
-        target: 'http://localhost:9000',
+        target: 'http://10.146.21.222:9000',
         changeOrigin: true,
         secure: false,
       }

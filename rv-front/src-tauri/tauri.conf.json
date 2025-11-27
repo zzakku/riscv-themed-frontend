@@ -5,7 +5,7 @@
   "identifier": "com.zzakku.rvwebappclient",
   "build": {
     "frontendDist": "../dist",
-    "devUrl": "https://192.168.1.36:3000",
+    "devUrl": "https://10.146.21.222:3000",
     "beforeDevCommand": "npm run dev -- --host",
     "beforeBuildCommand": "npm run build"
   },

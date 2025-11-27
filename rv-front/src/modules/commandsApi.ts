@@ -120,8 +120,8 @@ export const getAllCommands = async (query?: string): Promise<Command[]> => {
 
     if (Array.isArray(data)) {
       return data;
-    } else if (data && Array.isArray(data.reactions)) {
-      return data.reactions;
+    } else if (data && Array.isArray(data.commands)) {
+      return data.commands;
     } else if (data && data.data && Array.isArray(data.data)) {
       return data.data;
     } else {

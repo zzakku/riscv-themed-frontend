@@ -33,8 +33,8 @@ export const MainPage: FC = () => {
 
                   <hr className="divider my-4" />
 
-                  <div className="reactions-section">
-                    {/* <h2 className="reactions-title mb-3">Список команд</h2> */}
+                  <div className="commands-section">
+                    {/* <h2 className="commands-title mb-3">Список команд</h2> */}
                     
                     {/* <Link to={ROUTES.COMMANDS}>
                       <Button variant="primary" size="lg" className="commands-btn">
