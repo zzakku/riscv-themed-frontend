@@ -3,7 +3,7 @@ const target_github_pages = false; // ПЕРЕКЛЮЧИСЬ, ЕСЛИ ТАРГ�
 
 export const API_BASE_URL = target_tauri || target_github_pages
   ? 'https://1afa8552089991.lhr.life/api'  // Для Tauri/GHP - прямой IP
-  : '/api';                       // Для dev - proxy
+  : '';                       // Для dev - proxy
 
 export const IMAGE_BASE_URL = target_tauri || target_github_pages
   ? 'http://10.146.21.222:9000'  // Для Tauri/GHP - прямой IP

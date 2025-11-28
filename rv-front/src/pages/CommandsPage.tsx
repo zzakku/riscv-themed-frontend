@@ -1,5 +1,5 @@
 import "./CommandsPage.css";
-import { type FC, useState, useEffect } from "react";
+import { type FC, useEffect } from "react";
 import { 
   Container, 
   Row, 
@@ -9,94 +9,109 @@ import {
   Spinner
 } from "react-bootstrap";
 import { CommandCard } from "../components/CommandCard";
-import { type Command, getAllCommands } from "../modules/commandsApi";
+// import { type Command, getAllCommands } from "../modules/commandsApi";
 import { useNavigate } from "react-router-dom";
 import { ROUTE_LABELS } from "../Routes";
 import { BreadCrumbs } from "../components/BreadCrumbs";
 import { Navigation } from "../components/Navigation";
-import { COMMANDS_MOCK } from "../modules/mock";
+// import { COMMANDS_MOCK } from "../modules/mock";
 
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { setSearchQuery } from '../store/filterSlice';
 
-interface CommandsPageProps {
-  programID?: string;
-}
+import { useSelector } from 'react-redux';
+import { type RootState } from '../store/store';
+import { getCommands } from '../store/slices/commandSlice';
+// import { type DsCommand } from '../api/Api';
 
-export const CommandsPage: FC<CommandsPageProps> = ({  
-  programID = "" 
-}) => {
-  const [commands, setCommands] = useState<Command[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
+// interface CommandsPageProps {
+//   programID?: string;
+// }
+
+export const CommandsPage: FC = () => {
+  // const [searchLoading, setSearchLoading] = useState(false);
+  // const [cartCount, setCartCount] = useState(0);
 //const [programID, setProgramID] = useState(-1);
 
+  // const [loading, setLoading] = useState(false);
+
   const dispatch = useAppDispatch();
-  const { searchQuery } = useAppSelector((state) => state.filters)
+  const { searchQuery } = useSelector((state: RootState) => state.filters);
+  // const [commands, setCommands] = useState<Command[]>([]);
+    const { cartCount, programId } = useAppSelector((state) => state.draftProgram);
+  const { commands, loading } = useSelector((state: RootState) => state.commands); // получение данных из стора
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadCommands();
-    loadCartCount();
-  }, []);
+    dispatch(getCommands({query: searchQuery}));
+    // loadCartCount();
+  }, [dispatch]);
 
-  const loadCommands = async (query: string = searchQuery) => {
-    setLoading(true);
-    try {
-      const data = await getAllCommands(query);
-      setCommands(data);
-    } catch (error) {
-      console.error("Ошибка при загрузке команд:", error);
-      setCommands(
-        COMMANDS_MOCK.filter((item) =>
-          item.com_name
-            .toLocaleLowerCase()
-            .startsWith(searchQuery.toLocaleLowerCase())
-        )
-      );
-    } finally {
-      setLoading(false);
+  // const loadCommands = async (query: string = searchQuery) => {
+  //   setLoading(true);
+  //   try {
+  //     const data = await getCommands( {query} );
+  //   } catch (error) {
+  //     console.error("Ошибка при загрузке команд:", error);
+  //     setCommands(
+  //       COMMANDS_MOCK.filter((item) =>
+  //         item.com_name
+  //           .toLocaleLowerCase()
+  //           .startsWith(searchQuery.toLocaleLowerCase())
+  //       )
+  //     );
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // const handleSearch = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setSearchLoading(true);
+  //   await loadCommands(searchQuery);
+  //   setSearchLoading(false);
+  // };
+
+  // const handleSearchChange = (value: string) => {
+  //   dispatch(setSearchQuery(value));
+  // };
+
+  const handleDetailsClick = (id?: number) => {
+    if (id == null) {
+      console.error("???");      
+    }
+    else {
+      navigate(`/commands/${id}`);
     }
   };
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearchLoading(true);
-    await loadCommands(searchQuery);
-    setSearchLoading(false);
-  };
-
-  const handleSearchChange = (value: string) => {
-    dispatch(setSearchQuery(value));
-  };
-
-  const handleDetailsClick = (id: number) => {
-    navigate(`/commands/${id}`);
-  };
-
-  const handleAddToProgram = async (commandId: number) => {
-    try {
-      // Здесь будет вызов API для добавления команды в программу
-      console.log("Добавляем команду в программу:", commandId);
-    } catch (error) {
-      console.error("Ошибка при добавлении команды:", error);
+  const handleAddToProgram = async (commandId?: number) => {
+    if (commandId == null) {
+      console.error("???");      
     }
+    else {
+      try {
+        // Здесь будет вызов API для добавления команды в программу
+        console.log("Добавляем команду в программу:", commandId);
+      } catch (error) {
+        console.error("Ошибка при добавлении команды:", error);
+      }
+    }    
   };
 
   const handleCartClick = () => {
-    if (cartCount > 0 && programID) {
-      navigate(`/program/${programID}`);
+    if (cartCount > 0 && programId) {
+      navigate(`/program/${programId}`);
     }
   };
 
-  const loadCartCount = async () => {
-    //try {
-    // Вызов API будет здесь позже 
-    //}
-      setCartCount(0);
-  }
+  // const loadCartCount = async () => {
+  //   //try {
+  //   // Вызов API будет здесь позже 
+  //   //}
+  //     setCartCount(0);
+  // }
 
   return (
     <div className="commands-page">
@@ -127,24 +142,24 @@ export const CommandsPage: FC<CommandsPageProps> = ({
               overflow: 'hidden'
             }}
           >
-            <Form onSubmit={handleSearch} className="custom-search-form">
+            <Form onSubmit={() => dispatch(getCommands({query: searchQuery}))} className="custom-search-form">
               <div className="search-fields-wrapper">
                 <div className="search-input-container">
                   <Form.Control
                     type="text"
                     value={searchQuery}
-                    onChange={(e) => handleSearchChange(e.target.value)}
+                    onChange={(event => dispatch(setSearchQuery(event.target.value)))}
                     placeholder="Поиск"
                     className="custom-search-input mag-glass"
-                    disabled={searchLoading}
+                    disabled={loading}
                   />
                 </div>
                 <Button 
                   type="submit" 
                   className="custom-search-btn"
-                  disabled={searchLoading}
+                  disabled={loading}
                 >
-                  {searchLoading ? (
+                  {loading ? (
                     <>
                       <Spinner
                         as="span"

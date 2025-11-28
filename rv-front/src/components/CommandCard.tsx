@@ -3,12 +3,12 @@ import { Card, Button } from 'react-bootstrap'
 import "./CommandCard.css"
 
 interface Props {
-    id: number
-    img: string
-    comName: string
-    fmt: string
-    rsNum: number
-    rdNum: number
+    id?: number
+    img?: string
+    comName?: string
+    fmt?: string
+    rsNum?: number
+    rdNum?: number
     onDetailsClick: () => void
     onAddToProgram: () => void
 }
@@ -22,7 +22,7 @@ export const CommandCard: FC<Props> = ({
     onDetailsClick
 }) => {
 
-    const processImageUrl = (url: string) => {
+    const processImageUrl = (url?: string) => {
         if (!url) return '';
         
         const localhostPatterns = [

@@ -21,6 +21,20 @@ const initialState: CommandsState = {
   error: null,
 };
 
+// export const getCommands = createAsyncThunk(
+//   'commands/getCommands',
+//   async (_, { getState, rejectWithValue }) => {
+//     const { commands }: any = getState();
+//     try {
+//       const response = await api.api.commandsList({query: commands.searchQuery});
+
+//       return response.data;
+//     } catch (error) {
+//       return rejectWithValue('Ошибка при загрузке данных');
+//     }
+//   }
+// );
+
 export const getCommands = createAsyncThunk(
   'commands/getCommands',
   async (filters: { query?: string; } = {}, { rejectWithValue }) => {
@@ -87,7 +101,7 @@ const commandsSlice = createSlice({
       })
       .addCase(getCommands.fulfilled, (state, action) => {
         state.loading = false;
-        state.commands = action.payload.data as DsCommand[];
+        state.commands = action.payload.data.data as DsCommand[];
       })
       .addCase(getCommands.rejected, (state, action) => {
         state.loading = false;
@@ -98,7 +112,7 @@ const commandsSlice = createSlice({
       })
       .addCase(getCommand.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentCommand = action.payload.data as DsCommand;
+        state.currentCommand = action.payload.data.data as DsCommand;
       })
       .addCase(getCommand.rejected, (state, action) => {
         state.loading = false;

@@ -62,10 +62,9 @@ export interface HandlerOperandReq {
   operand: number;
 }
 
-export interface HandlerFilterReq {
-  start_date: string;
-  end_date: string;
-  status: string;
+export interface HandlerProgramCartResp {
+  count?: number;
+  prg_id?: number;
 }
 
 export interface HandlerProgramCmdsResp {
@@ -95,6 +94,11 @@ export interface HandlerRegisterRequest {
   login: string;
   /** @minLength 6 */
   password: string;
+}
+
+export interface HandlerSuccessCartResp {
+  data?: HandlerProgramCartResp;
+  status?: string;
 }
 
 export interface HandlerSuccessMessageResp {
@@ -518,7 +522,7 @@ export class Api<
       }),
 
     /**
-     * @description Получает ID текущей программы-черновика и количество команд в ней. Доступно всем, для госта всегда возвращается 0, 0
+     * @description Получает ID текущей программы-черновика и количество команд в ней. Доступно всем, для гостя всегда возвращается 0, 0
      *
      * @tags programs
      * @name ProgramsCartIconList
@@ -526,7 +530,7 @@ export class Api<
      * @request GET:/api/programs/cart-icon
      */
     programsCartIconList: (params: RequestParams = {}) =>
-      this.request<HandlerProgramCmdsResp, void | HandlerErrorResponse>({
+      this.request<HandlerSuccessCartResp, void | HandlerErrorResponse>({
         path: `/api/programs/cart-icon`,
         method: "GET",
         format: "json",
