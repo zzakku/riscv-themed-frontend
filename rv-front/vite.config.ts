@@ -24,7 +24,7 @@ export default defineConfig({
       //   changeOrigin: true,
       // },
       '/rvimg': {
-        target: 'http://10.146.21.222:9000',
+        target: 'http://localhost:9000',
         changeOrigin: true,
         secure: false,
       }

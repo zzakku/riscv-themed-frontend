@@ -1,3 +1,4 @@
+/* components/Navigation.css */
 .custom-navbar {
   background: #FFFFFF;
   border-bottom: 1px solid #DDDEE1;
@@ -31,35 +32,100 @@
   display: flex;
   align-items: center;
   gap: 35px;
+  height: 100%;
 }
 
 .nav__link {
   text-decoration: none;
   color: rgb(0,50,98);
   position: relative;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 16px;
+  padding: 0;
+  line-height: 24px; /* Добавляем line-height для выравнивания */
+  display: flex;
+  align-items: center;
 }
 
 .nav__link:hover {
   color: rgb(51,91,129);
 }
 
-.nav__link--cart {
-  color: rgb(0,50,98);
-  padding: 5px 10px;
-  background-color: #fff;
-  border-radius: 5px;
-  font-weight: 700;
+.nav__link.active {
+  font-weight: 500;
 }
 
-.nav__link.active::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 3px;
-  left: 0;
-  bottom: -7px;
-  background-color: #fff;
+/* Dropdown для пользователя - логин на том же уровне */
+.nav__dropdown {
+  margin-left: 0;
 }
+
+.nav__user-toggle {
+  text-decoration: none !important;
+  color: rgb(0,50,98) !important;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 16px !important; /* Та же высота шрифта */
+  font-weight: 500 !important;
+  padding: 0 !important; /* Убираем лишние паддинги */
+  border: none !important;
+  background: transparent !important;
+  transition: all 0.2s;
+  line-height: 24px !important; /* Та же line-height */
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.nav__user-toggle:hover {
+  color: rgb(51,91,129) !important;
+  background: transparent !important;
+}
+
+.nav__user-toggle:focus {
+  box-shadow: none !important;
+}
+
+.nav__user-toggle::after {
+  margin-left: 5px;
+  vertical-align: middle;
+  border-top-color: rgb(0,50,98) !important;
+}
+
+.nav__user-name {
+  display: inline-block;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Dropdown меню */
+.nav__dropdown .dropdown-menu {
+  border: 1px solid #DDDEE1;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  margin-top: 5px;
+}
+
+.nav__dropdown .dropdown-item {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 14px;
+  padding: 8px 16px;
+  color: #333;
+}
+
+.nav__dropdown .dropdown-item:hover {
+  background-color: rgba(0, 50, 98, 0.05);
+  color: rgb(0,50,98);
+}
+
+.nav__dropdown .dropdown-divider {
+  margin: 5px 0;
+  border-color: #DDDEE1;
+}
+
+/* ... остальные стили остаются без изменений ... */
 
 /* Мобильное меню */
 .nav__mobile-wrapper {
@@ -89,7 +155,7 @@
   transform: rotate(45deg)
 }
 
-.nav__mobile-target::after, .nav__mobile-target::before {
+/* .nav__mobile-target::after, .nav__mobile-target::before {
   content: '';
   position: absolute;
   left: 0;
@@ -100,7 +166,7 @@
 
 .nav__mobile-target::after {
   top: -7px;
-}
+} */
 
 .nav__mobile-target::before {
   bottom: -7px;
@@ -120,18 +186,83 @@
   top: 100%;
   right: 0;
   flex-direction: column;
-  gap: 15px;
-  background-color: rgb(246, 178, 25);
+  gap: 10px;
+  background-color: #FFFFFF;
   padding: 20px;
-  min-width: 150px;
-  border-radius: 10px;
+  min-width: 200px;
+  border-radius: 8px;
   display: none;
   z-index: 1000;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border: 1px solid #DDDEE1;
 }
 
 .nav__mobile-button.active + .nav__mobile-menu {
   display: flex;
+}
+
+/* Информация о пользователе в мобильном меню */
+.nav__mobile-user-info {
+  padding: 15px 0;
+  border-bottom: 1px solid #DDDEE1;
+  margin-bottom: 10px;
+}
+
+.nav__mobile-user-name {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: rgb(0,50,98);
+  margin-bottom: 4px;
+}
+
+.nav__mobile-user-role {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 14px;
+  color: #6B6E76;
+}
+
+.nav__mobile-logout {
+  color: #dc3545 !important;
+  text-align: left;
+  padding: 8px 0 !important;
+  margin-top: 10px;
+}
+
+.nav__mobile-logout:hover {
+  color: #c82333 !important;
+  background: transparent !important;
+  text-decoration: underline !important;
+}
+
+/* Кнопка входа/выхода */
+.my-btn {
+  background: rgb(0,50,98);
+  color: #fff;
+  border: none;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 8px 20px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  text-decoration: none !important;
+}
+
+.my-btn:hover {
+  background: rgb(51,91,129);
+  color: #fff;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .nav__links {
+    gap: 20px;
+  }
+  
+  .nav__user-name {
+    max-width: 120px;
+  }
 }
 
 @media (max-width: 545px) {
@@ -142,16 +273,19 @@
   .nav__mobile-wrapper {
     display: block;
   }
+  
+  .my-btn {
+    display: none;
+  }
+  
+  .nav__mobile-menu .nav__link {
+    padding: 10px 0;
+    font-size: 16px;
+  }
 }
 
-.my-btn {
-    background: rgb(0,50,98);
-    color: #fff;
-    border-bottom: 1px solid #DDDEE1;
-    text-decoration: underline;
-}
-
-.my-btn:hover {
-    background: rgb(51,91,129);
-    color: #fff;
+@media (min-width: 546px) {
+  .nav__mobile-wrapper {
+    display: none;
+  }
 }

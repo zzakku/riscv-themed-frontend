@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '../../api';
 import type { UserState } from './userSlice';
-import { type HandlerModifyProgramFieldsReq } from '../../api/Api';
+import { type HandlerOperandReq } from '../../api/Api';
 
 interface DraftProgramState {
   cartCount: number;
@@ -12,7 +12,7 @@ interface DraftProgramState {
 
 const initialState: DraftProgramState = {
   cartCount: 0,
-  programId: -1,
+  programId: -1,  
   loading: false,
   error: null,
 };
@@ -21,56 +21,79 @@ export const getDraftProgram = createAsyncThunk(
   'draftProgram/getDraftProgram',
   async (_, { getState, rejectWithValue }) => {
     try {
-      const state = getState() as { user: UserState };
-      const token = state.user.token;
+      const state = getState() as { users: UserState };
+      const token = state.users.token;
       
       if (!token) {
         return rejectWithValue('Требуется авторизация');
       }
 
       const response = await api.api.programsCartIconList({
-        secure: true,
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      return response;
+      return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.error || 'Ошибка загрузки корзины');
+      return rejectWithValue(error.response?.data?.description || 'Ошибка загрузки корзины');
     }
   }
 );
 
-export const updateProgramScenario = createAsyncThunk(
-  'draftProgram/updateProgramScenario',
-  async ({ 
-    programId, 
-    updateData 
-  }: { 
-    programId: number; 
-    updateData: HandlerModifyProgramFieldsReq 
-  }, { getState, rejectWithValue }) => {
+export const addCommandToProgram = createAsyncThunk(
+  'draftProgram/adProgram',
+  async (commandId: number, { getState, rejectWithValue }) => {
     try {
-      const state = getState() as { user: UserState };
-      const token = state.user.token;
+      const state = getState() as { users: UserState };
+      const token = state.users.token;
       
       if (!token) {
         return rejectWithValue('Требуется авторизация');
       }
 
-      const response = await api.api.programsUpdate(
-        programId, 
-        updateData, 
+      const response = await api.api.commandsAddToProgramCreate(commandId, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.description || 'Ошибка добавления команды в программу');
+    }
+  }
+);
+
+export const updateCommandOperand = createAsyncThunk(
+  'draftProgram/updateCommandOperand',
+  async ({ 
+    commandId, 
+    operand 
+  }: { 
+    commandId: number; 
+    operand: number 
+  }, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as { users: UserState };
+      const token = state.users.token;
+      
+      if (!token) {
+        return rejectWithValue('Требуется авторизация');
+      }
+
+      const request: HandlerOperandReq = { operand };
+      const response = await api.api.commandsProgramsUpdate(
+        { command_id: commandId },
+        request,
         {
-          secure: true,
           headers: {
             Authorization: `Bearer ${token}`
           }
         }
       );
-      return response;
+      return { response: response.data, commandId, operand };
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.error || 'Ошибка обновления сценария');
+      return rejectWithValue(error.response?.data?.description || 'Ошибка обновления операнда');
     }
   }
 );
@@ -79,22 +102,47 @@ export const removeCommandFromProgram = createAsyncThunk(
   'draftProgram/removeCommandFromProgram',
   async ({ commandId }: { commandId: number }, { getState, rejectWithValue }) => {
     try {
-      const state = getState() as { user: UserState };
-      const token = state.user.token;
+      const state = getState() as { users: UserState };
+      const token = state.users.token;
       
       if (!token) {
         return rejectWithValue('Требуется авторизация');
       }
 
-      const response = await api.api.commandsProgramsDelete( {command_id: commandId}, {
-        secure: true,
+      const response = await api.api.commandsProgramsDelete(
+        { command_id: commandId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      return { response: response.data, commandId };
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.description || 'Ошибка удаления команды');
+    }
+  }
+);
+
+export const deleteDraftProgram = createAsyncThunk(
+  'draftProgram/deleteDraftProgram',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as { users: UserState };
+      const token = state.users.token;
+      
+      if (!token) {
+        return rejectWithValue('Требуется авторизация');
+      }
+
+      const response = await api.api.programsDelete({
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      return { response, commandId };
+      return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.error || 'Ошибка удаления команды');
+      return rejectWithValue(error.response?.data?.description || 'Ошибка удаления черновика');
     }
   }
 );
@@ -105,7 +153,7 @@ const draftProgramSlice = createSlice({
   reducers: {
     clearDraft: (state) => {
       state.cartCount = 0;
-      state.programId = null;
+      state.programId = -1;  
       state.error = null;
     },
     updateCartCount: (state, action) => {
@@ -123,22 +171,31 @@ const draftProgramSlice = createSlice({
       })
       .addCase(getDraftProgram.fulfilled, (state, action) => {
         state.loading = false;
-        state.cartCount = action.payload.data.data?.count || 0;
-        state.programId = action.payload.data.data?.prg_id || null;
+        state.cartCount = action.payload.data?.count || 0;
+        state.programId = action.payload.data?.prg_id ?? -1;
       })
       .addCase(getDraftProgram.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
       .addCase(removeCommandFromProgram.fulfilled, (state) => {
-        // После удаления сценария уменьшаем счетчик
+        // После удаления команды уменьшаем счетчик
         if (state.cartCount > 0) {
           state.cartCount -= 1;
         }
-        // Если сценариев не осталось, сбрасываем programId
+        // Если команд не осталось, сбрасываем programId на -1
         if (state.cartCount === 0) {
-          state.programId = null;
+          state.programId = -1;  
         }
+      })
+      .addCase(deleteDraftProgram.fulfilled, (state) => {
+        // После удаления черновика сбрасываем состояние
+        state.cartCount = 0;
+        state.programId = -1;  
+        state.error = null;
+      })
+      .addCase(deleteDraftProgram.rejected, (state, action) => {
+        state.error = action.payload as string;
       });
   },
 });

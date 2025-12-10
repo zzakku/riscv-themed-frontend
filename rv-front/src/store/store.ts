@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import filterReducer from './filterSlice';
 import userReducer from './slices/userSlice';
 import commandsReducers from './slices/commandSlice'
+import programsReducer from './slices/programSlice'
 import draftProgramReducer from './slices/programDraftSlice'
 
 const enableDevTools = true; 
@@ -11,6 +12,7 @@ export const store = configureStore({
     filters: filterReducer,
     users: userReducer,
     commands: commandsReducers,
+    programs: programsReducer,
     draftProgram: draftProgramReducer,
   },
   devTools: enableDevTools,

@@ -495,10 +495,21 @@ export class Api<
      * @summary Получить список програм
      * @request GET:/api/programs
      */
-    programsList: (request: HandlerFilterReq, params: RequestParams = {}) =>
-      this.request<HandlerProgramCmdsResp, void | HandlerErrorResponse>({
+    programsList: (
+      query?: {
+        /** Статус программы */
+        status?: string;
+        /** Дата начала фильтрации (формат: DD.MM.YYYY) */
+        start_date?: string;
+        /** Дата окончания фильтрации (формат: DD.MM.YYYY) */
+        end_date?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<HandlerSuccessResponse, void | HandlerErrorResponse>({
         path: `/api/programs`,
         method: "GET",
+        query: query,
         format: "json",
         ...params,
       }),
@@ -616,50 +627,6 @@ export class Api<
       }),
 
     /**
-     * @description Предоставляет текущему пользователю свои данные. Доступно авторизованным пользователям.
-     *
-     * @tags users
-     * @name UsersList
-     * @summary Получение данных пользователя
-     * @request GET:/api/users
-     * @secure
-     */
-    usersList: (params: RequestParams = {}) =>
-      this.request<
-        {
-          status?: string;
-          user?: object;
-        },
-        HandlerErrorResponse
-      >({
-        path: `/api/users`,
-        method: "GET",
-        secure: true,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Обновляет данные пользователя. Доступно авторизованным пользователям.
-     *
-     * @tags users
-     * @name UsersUpdate
-     * @summary Обновление данных в личном кабинете
-     * @request PUT:/api/users
-     * @secure
-     */
-    usersUpdate: (request: HandlerUserPutReq, params: RequestParams = {}) =>
-      this.request<HandlerSuccessResponse, HandlerErrorResponse>({
-        path: `/api/users`,
-        method: "PUT",
-        body: request,
-        secure: true,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
      * @description Выдача зарегистрированному пользователю JWT-токена
      *
      * @tags users
@@ -691,6 +658,53 @@ export class Api<
         path: `/api/users/log-out`,
         method: "POST",
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Предоставляет текущему пользователю свои данные. Доступно авторизованным пользователям.
+     *
+     * @tags users
+     * @name UsersProfileList
+     * @summary Получение данных пользователя
+     * @request GET:/api/users/profile
+     * @secure
+     */
+    usersProfileList: (params: RequestParams = {}) =>
+      this.request<
+        {
+          status?: string;
+          user?: object;
+        },
+        HandlerErrorResponse
+      >({
+        path: `/api/users/profile`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Обновляет данные пользователя. Доступно авторизованным пользователям.
+     *
+     * @tags users
+     * @name UsersProfileUpdate
+     * @summary Обновление данных в личном кабинете
+     * @request PUT:/api/users/profile
+     * @secure
+     */
+    usersProfileUpdate: (
+      request: HandlerUserPutReq,
+      params: RequestParams = {},
+    ) =>
+      this.request<HandlerSuccessResponse, HandlerErrorResponse>({
+        path: `/api/users/profile`,
+        method: "PUT",
+        body: request,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

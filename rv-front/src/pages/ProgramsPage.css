@@ -1,0 +1,28 @@
+/* Добавьте в конец ProgramsPage.css */
+
+/* Контент страницы */
+.programs-content {
+  padding: 20px 1.5%;
+}
+
+/* Стили для заголовка страницы (повторяем для ясности) */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #DDDEE1;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}

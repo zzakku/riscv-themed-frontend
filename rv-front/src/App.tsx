@@ -7,6 +7,10 @@ import { ROUTES } from './Routes';
 import { type FC } from "react";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { BASE_PATH } from './target_config';
+import ProgramPage from './pages/ProgramPage';
+import RegisterPage from './pages/RegisterPage';
+import ProfilePage from './pages/ProfilePage';
+import { ProgramsPage } from './pages/ProgramsPage';
 
 const App: FC = () => {
   return (
@@ -16,7 +20,11 @@ const App: FC = () => {
           <Route path={ROUTES.HOME} element={<MainPage />} />
           <Route path={ROUTES.COMMANDS} element={<CommandsPage />} />
           <Route path={ROUTES.COMMANDS_INFO} element={<CommandInfoPage />} />
+          <Route path={ROUTES.PROGRAM} element={<ProgramPage />} />
+          <Route path={ROUTES.PROGRAMS} element={<ProgramsPage />} />
           <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+          <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+          <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
         </Routes>
       </div>
     </BrowserRouter>

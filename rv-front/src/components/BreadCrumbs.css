@@ -1,3 +1,4 @@
+/* components/BreadCrumbs.css */
 :root {
   --active_color: black;
   --additional_color: gray;
@@ -7,8 +8,11 @@
   list-style: none;
   display: flex;
   gap: 10px;
-  /* padding: 20px; */
+  padding: 20px;
   padding-left: 12px;
+  margin: 0;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 16px;
 }
 
 .breadcrumbs * {
@@ -27,4 +31,23 @@
 
 .breadcrumbs li:last-child {
   color: var(--active_color);
+}
+
+.breadcrumbs a {
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+  .breadcrumbs {
+    padding: 15px 10px;
+    font-size: 14px;
+    gap: 8px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }

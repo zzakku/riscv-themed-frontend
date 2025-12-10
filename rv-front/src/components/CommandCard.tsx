@@ -1,5 +1,5 @@
 import { type FC } from 'react'
-import { Card, Button } from 'react-bootstrap'
+import { Card, Button, Spinner } from 'react-bootstrap'
 import "./CommandCard.css"
 
 interface Props {
@@ -11,6 +11,8 @@ interface Props {
     rdNum?: number
     onDetailsClick: () => void
     onAddToProgram: () => void
+    isAddingToProgram?: boolean
+    disabled?: boolean
 }
 
 export const CommandCard: FC<Props> = ({ 
@@ -19,7 +21,10 @@ export const CommandCard: FC<Props> = ({
     fmt, 
     rsNum, 
     rdNum, 
-    onDetailsClick
+    onDetailsClick,
+    onAddToProgram,
+    isAddingToProgram = false,
+    disabled = false
 }) => {
 
     const processImageUrl = (url?: string) => {
@@ -35,8 +40,8 @@ export const CommandCard: FC<Props> = ({
         let processedUrl = url;
         localhostPatterns.forEach(pattern => {
             if (pattern.test(url)) {
-            const currentHost = window.location.host;
-            processedUrl = url.replace(pattern, `https://${currentHost}`);
+                const currentHost = window.location.host;
+                processedUrl = url.replace(pattern, `https://${currentHost}`);
             }
         });
         
@@ -50,6 +55,9 @@ export const CommandCard: FC<Props> = ({
                 src={processImageUrl(img)} 
                 className="custom-card-image"
                 alt={comName}
+                onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/placeholder-image.png';
+                }}
             />
             
             <Card.Body className="custom-card-body p-0">
@@ -76,8 +84,28 @@ export const CommandCard: FC<Props> = ({
                 <Button 
                     className="custom-card-btn my-btn" 
                     onClick={onDetailsClick}
+                    disabled={disabled}
                 >
                     Подробнее
+                </Button>
+                <Button 
+                    className="custom-card-btn my-btn" 
+                    onClick={onAddToProgram}
+                    disabled={disabled || isAddingToProgram}
+                >
+                    {isAddingToProgram ? (
+                        <>
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="me-2"
+                            />
+                            Добавление...
+                        </>
+                    ) : 'Добавить в программу'}
                 </Button>
             </Card.Body>
         </Card>

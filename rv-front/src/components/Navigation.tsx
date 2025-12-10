@@ -1,9 +1,12 @@
+// Navigation.tsx
 import "./Navigation.css";
 import { type FC, useState } from "react";
 import { 
   Container, 
   Navbar,
-  Button
+  Button,
+  Dropdown,
+  Nav
 } from "react-bootstrap";
 import { Link, NavLink } from "react-router-dom"
 import Logo from "../assets/logo.png";
@@ -11,9 +14,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
 import { type AppDispatch, type RootState } from '../store/store';
 import { logoutUser } from '../store/slices/userSlice'; 
-// import { setSearchValue, getCitiesList } from '../store/filterSlice'; 
 import { setSearchQuery } from '../store/filterSlice'; 
 import { ROUTES } from "../Routes";
+import { clearDraft } from "../store/slices/programDraftSlice";
 
 export const Navigation: FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -25,18 +28,28 @@ export const Navigation: FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const isAuthenticated = useSelector((state: RootState) => state.users.isAuthenticated); // получение из стора значения флага состояния приложения
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.users);
 
   // Обработчик события нажатия на кнопку "Выйти"
   const handleExit = async ()  => {
-      await dispatch(logoutUser());
+    await dispatch(logoutUser());
+    dispatch(setSearchQuery(''));
+    dispatch(clearDraft());
+    navigate(ROUTES.COMMANDS);
+    setIsMobileMenuOpen(false); // Закрываем мобильное меню при выходе
+  };
 
-      dispatch(setSearchQuery('')); // можно реализовать в `extrareducers` у функции logoutUser
-      
-      navigate('/commands'); // переход на страницу списка услуг
+  // Обработчик перехода в профиль
+  const handleProfileClick = () => {
+    navigate(ROUTES.PROFILE);
+    setIsMobileMenuOpen(false);
+  };
 
-      // await dispatch(getCitiesList()); // для показа очищения поля поиска
-  }
+  // Обработчик перехода в программы
+  const handleProgramsClick = () => {
+    navigate(ROUTES.PROGRAMS); // Предполагается, что ROUTES.PROGRAMS определен
+    setIsMobileMenuOpen(false);
+  };
 
   return (
       <Navbar className="custom-navbar" expand="lg">
@@ -54,17 +67,40 @@ export const Navigation: FC = () => {
             <div className='nav__links'>
               <NavLink to='/' className='nav__link'>Главная</NavLink>
               <NavLink to='/commands' className='nav__link'>Команды</NavLink>
+              
+              {isAuthenticated && (
+                <NavLink to='/programs' className='nav__link'>Программы</NavLink>
+              )}
+              
+              {isAuthenticated && user && (
+                <Dropdown align="end" className="nav__dropdown">
+                  <Dropdown.Toggle 
+                    variant="link" 
+                    id="user-dropdown"
+                    className="nav__user-toggle"
+                  >
+                    <span className="nav__user-name">{user.login}</span>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item onClick={handleProfileClick}>
+                      Личный кабинет
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={handleProgramsClick}>
+                      Мои программы
+                    </Dropdown.Item>
+                    <Dropdown.Divider />
+                    <Dropdown.Item onClick={handleExit}>
+                      Выйти
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              )}
             </div>
-            {(isAuthenticated == false ) && (
+            
+            {(isAuthenticated == false) && (
                 <Link to={ROUTES.LOGIN}>
                     <Button className="my-btn">Войти</Button>
                 </Link>
-            )}
-
-            {(isAuthenticated == true) && (
-                <Button type="submit" className="my-btn" onClick={ handleExit }>
-                    Выйти
-                </Button>
             )}
             
             {/* Мобильное меню */}
@@ -78,6 +114,70 @@ export const Navigation: FC = () => {
               <div className='nav__mobile-menu'>
                 <NavLink to='/' className='nav__link' onClick={toggleMobileMenu}>Главная</NavLink>
                 <NavLink to='/commands' className='nav__link' onClick={toggleMobileMenu}>Команды</NavLink>
+                
+                {/* Ссылка на программы для аутентифицированных в мобильном меню */}
+                {isAuthenticated && (
+                  <NavLink 
+                    to='/programs' 
+                    className='nav__link'
+                    onClick={toggleMobileMenu}
+                  >
+                    Программы
+                  </NavLink>
+                )}
+                
+                {isAuthenticated && user && (
+                  <>
+                    <div className="nav__mobile-user-info">
+                      <div className="nav__mobile-user-name">{user.login}</div>
+                      <div className="nav__mobile-user-role">
+                        {user.is_moderator ? 'Модератор' : 'Пользователь'}
+                      </div>
+                    </div>
+                    <Nav.Link 
+                      as={Link} 
+                      to={ROUTES.PROFILE} 
+                      className="nav__link"
+                      onClick={() => {
+                        handleProfileClick();
+                        toggleMobileMenu();
+                      }}
+                    >
+                      Личный кабинет
+                    </Nav.Link>
+                    <Nav.Link 
+                      as={Link} 
+                      to={ROUTES.PROGRAMS} 
+                      className="nav__link"
+                      onClick={() => {
+                        handleProgramsClick();
+                        toggleMobileMenu();
+                      }}
+                    >
+                      Мои программы
+                    </Nav.Link>
+                    <Button 
+                      variant="link" 
+                      className="nav__link nav__mobile-logout"
+                      onClick={() => {
+                        handleExit();
+                        toggleMobileMenu();
+                      }}
+                    >
+                      Выйти
+                    </Button>
+                  </>
+                )}
+                
+                {(isAuthenticated == false) && (
+                  <Link 
+                    to={ROUTES.LOGIN} 
+                    className='nav__link'
+                    onClick={toggleMobileMenu}
+                  >
+                    Войти
+                  </Link>
+                )}
               </div>
             </div>
           </div>
