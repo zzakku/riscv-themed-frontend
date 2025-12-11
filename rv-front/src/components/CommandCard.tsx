@@ -27,24 +27,28 @@ export const CommandCard: FC<Props> = ({
     disabled = false
 }) => {
 
-    const processImageUrl = (url?: string) => {
+    const processImageUrl = (url: string | undefined) => {
         if (!url) return '';
         
-        const localhostPatterns = [
-            /http:\/\/localhost(?::\d+)?/,
-            /http:\/\/127.0.0.1(?::\d+)?/,
-            /http:\/\/0.0.0.0(?::\d+)?/,
-            /http:\/\/::1(?::\d+)?/
-        ];
+        // const localhostPatterns = [
+        //     /http:\/\/localhost(?::\d+)?/,
+        //     /http:\/\/127.0.0.1(?::\d+)?/,
+        //     /http:\/\/0.0.0.0(?::\d+)?/,
+        //     /http:\/\/::1(?::\d+)?/
+        // ];
         
-        let processedUrl = url;
-        localhostPatterns.forEach(pattern => {
-            if (pattern.test(url)) {
-                const currentHost = window.location.host;
-                processedUrl = url.replace(pattern, `https://${currentHost}`);
-            }
-        });
+        // let processedUrl = url;
+        // localhostPatterns.forEach(pattern => {
+        //     if (pattern.test(url)) {
+        //     const currentHost = window.location.host;
+        //     processedUrl = url.replace(pattern, `https://${currentHost}`);
+        //     }
+        // });
         
+        // return processedUrl;
+
+        let processedUrl = url.replace('9000','8081/minio');
+
         return processedUrl;
     };
 
