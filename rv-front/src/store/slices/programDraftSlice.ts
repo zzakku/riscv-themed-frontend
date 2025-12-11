@@ -82,6 +82,9 @@ export const updateCommandOperand = createAsyncThunk(
       }
 
       const request: HandlerOperandReq = { operand };
+
+      console.log('Updating operand:', request); // Для отладки
+      
       const response = await api.api.commandsProgramsUpdate(
         { command_id: commandId },
         request,

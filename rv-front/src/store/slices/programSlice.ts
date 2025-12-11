@@ -106,9 +106,15 @@ export const updateProgram = createAsyncThunk(
         return rejectWithValue('Требуется авторизация');
       }
 
+
+      const payload = {
+        init_t1: updateData.init_t1 ?? 0,
+        init_t2: updateData.init_t2 ?? 0
+      };
+
       const response = await api.api.programsUpdate(
         programId, 
-        updateData, 
+        payload, 
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -159,12 +165,40 @@ export const deleteProgramById = createAsyncThunk(
       // Используем переменную programId чтобы избежать предупреждения
       console.log('Попытка удаления программы с ID:', programId);
       
-      // Внимание: В API нет метода для удаления программы по ID
-      // Только удаление черновика текущего пользователя
-      // Если нужно удалять по ID, нужно расширить API
       return rejectWithValue('Метод удаления программы по ID не реализован');
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.description || 'Ошибка удаления заявки');
+    }
+  }
+);
+
+// store/slices/programSlice.ts
+export const moderateProgram = createAsyncThunk(
+  'programs/moderateProgram',
+  async (
+    { programId, is_accepted }: { programId: number; is_accepted: boolean },
+    { getState, rejectWithValue }
+  ) => {
+    try {
+      const state = getState() as { users: UserState };
+      const token = state.users.token;
+      
+      if (!token) {
+        return rejectWithValue('Требуется авторизация');
+      }
+
+      const response = await api.api.programsModerateUpdate(
+        programId,
+        { is_accepted },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.description || 'Ошибка модерации программы');
     }
   }
 );
@@ -241,6 +275,15 @@ const programsSlice = createSlice({
         );
         if (programIndex !== -1 && state.programs[programIndex]) {
           state.programs[programIndex].status = 'pending';
+        }
+      })
+        // Добавьте обработчик в extraReducers
+        .addCase(moderateProgram.fulfilled, (state, action) => {
+        // Обновляем программу в списке
+        const updatedProgram = action.payload;
+        const index = state.programs.findIndex(p => p.id === updatedProgram.program?.id);
+        if (index !== -1) {
+          state.programs[index] = updatedProgram;
         }
       });
   },

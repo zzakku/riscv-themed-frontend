@@ -1,5 +1,5 @@
 // pages/ProgramsPage.tsx
-import { type FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useState, useCallback, useRef } from 'react';
 import { 
   Container, 
   Table, 
@@ -11,18 +11,23 @@ import {
   Row, 
   Col, 
   Card,
-  Pagination
+  Pagination,
+  Modal
 } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { getPrograms } from '../store/slices/programSlice';
 import { getDraftProgram } from '../store/slices/programDraftSlice';
+import { moderateProgram } from '../store/slices/programSlice';
 import type { RootState } from '../store/store';
 import { ROUTES } from '../Routes';
 import { Navigation } from '../components/Navigation';
 import { BreadCrumbs } from '../components/BreadCrumbs';
 import { CartIcon } from '../components/CartIcon';
 import './ProgramsPage.css';
+
+// Константа для интервала polling
+const POLLING_INTERVAL = 10000; // 10 секунд
 
 export const ProgramsPage: FC = () => {
   const navigate = useNavigate();
@@ -36,7 +41,8 @@ export const ProgramsPage: FC = () => {
   const [filters, setFilters] = useState({
     status: '',
     start_date: '',
-    end_date: ''
+    end_date: '',
+    creator_login: '' // Новый фильтр по логину создателя
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,15 +51,34 @@ export const ProgramsPage: FC = () => {
     key: string;
     direction: 'asc' | 'desc';
   } | null>(null);
+  const [showModerateModal, setShowModerateModal] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState<any>(null);
+  const [moderationDecision, setModerationDecision] = useState<'approve' | 'reject' | null>(null);
+  const [isPolling, setIsPolling] = useState(false);
+  const pollingRef = useRef<number | null>(null);
 
-  // Инициализация данных
+  // Проверяем, является ли пользователь модератором
+  const isModerator = user?.is_moderator || false;
+
+  // Функция для загрузки данных с фильтрами
+  const loadPrograms = useCallback(async () => {
+    try {
+      // Отправляем только backend фильтры (без creator_login)
+      const backendFilters = {
+        status: filters.status,
+        start_date: filters.start_date,
+        end_date: filters.end_date
+      };
+      await dispatch(getPrograms(backendFilters)).unwrap();
+    } catch (err) {
+      console.error('Ошибка загрузки программ:', err);
+    }
+  }, [dispatch, filters.status, filters.start_date, filters.end_date]);
+
+  // Инициализация данных с short polling
   useEffect(() => {
     const loadData = async () => {
-      try {
-        await dispatch(getPrograms(filters)).unwrap();
-      } catch (err) {
-        console.error('Ошибка загрузки программ:', err);
-      }
+      await loadPrograms();
       
       if (isAuthenticated) {
         try {
@@ -65,13 +90,54 @@ export const ProgramsPage: FC = () => {
     };
     
     loadData();
-  }, [dispatch, isAuthenticated]);
+    
+    // Запускаем polling только для модераторов
+    if (isModerator) {
+      setIsPolling(true);
+    }
+    
+    // Очистка при размонтировании
+    return () => {
+      if (pollingRef.current) {
+        window.clearTimeout(pollingRef.current);
+      }
+    };
+  }, [dispatch, isAuthenticated, loadPrograms, isModerator]);
+
+  // Short polling эффект
+  useEffect(() => {
+    if (!isModerator || !isPolling) return;
+
+    const pollPrograms = async () => {
+      try {
+        await loadPrograms();
+      } catch (err) {
+        console.error('Ошибка polling:', err);
+      } finally {
+        // Планируем следующий polling
+        if (isPolling && pollingRef.current !== null) {
+          pollingRef.current = window.setTimeout(pollPrograms, POLLING_INTERVAL);
+        }
+      }
+    };
+
+    // Запускаем первый polling
+    pollingRef.current = window.setTimeout(pollPrograms, POLLING_INTERVAL);
+
+    // Очистка
+    return () => {
+      if (pollingRef.current) {
+        window.clearTimeout(pollingRef.current);
+        pollingRef.current = null;
+      }
+    };
+  }, [isModerator, isPolling, loadPrograms]);
 
   // Применить фильтры
   const handleApplyFilters = async () => {
     setCurrentPage(1);
     try {
-      await dispatch(getPrograms(filters)).unwrap();
+      await loadPrograms();
     } catch (err) {
       console.error('Ошибка при применении фильтров:', err);
     }
@@ -82,12 +148,13 @@ export const ProgramsPage: FC = () => {
     const resetFilters = {
       status: '',
       start_date: '',
-      end_date: ''
+      end_date: '',
+      creator_login: ''
     };
     setFilters(resetFilters);
     setCurrentPage(1);
     try {
-      await dispatch(getPrograms(resetFilters)).unwrap();
+      await loadPrograms();
     } catch (err) {
       console.error('Ошибка при сбросе фильтров:', err);
     }
@@ -105,7 +172,45 @@ export const ProgramsPage: FC = () => {
   };
 
   const handleViewProgram = (programId: number) => {
-    navigate(ROUTES.PROGRAM.replace(':programId', programId.toString()));
+    if (!programId) {
+      console.error('ID программы не указан');
+      return;
+    }
+    navigate(ROUTES.PROGRAM.replace(':id', programId.toString()));
+  };
+
+  // Обработчик модерации программы
+  const handleModerateProgram = (program: any) => {
+    if (!program?.id) {
+      console.error('Нельзя модерировать программу без ID');
+      return;
+    }
+    setSelectedProgram(program);
+    setShowModerateModal(true);
+  };
+
+  // Подтверждение модерации
+  const handleConfirmModeration = async () => {
+    if (!selectedProgram?.id || !moderationDecision) return;
+
+    try {
+      // Отправляем решение на бекенд
+      await dispatch(moderateProgram({
+        programId: selectedProgram.id,
+        is_accepted: moderationDecision === 'approve'
+      })).unwrap();
+      
+      // Обновляем список программ
+      await loadPrograms();
+      
+      // Закрываем модальное окно
+      setShowModerateModal(false);
+      setSelectedProgram(null);
+      setModerationDecision(null);
+      
+    } catch (err) {
+      console.error('Ошибка модерации:', err);
+    }
   };
 
   const handleSort = (key: string) => {
@@ -116,15 +221,38 @@ export const ProgramsPage: FC = () => {
     setSortConfig({ key, direction });
   };
 
-  const getStatusDisplay = (status: string) => {
+  const getStatusDisplay = (status?: string) => {
+    if (!status) return 'Не указан';
+    
     const statusMap: Record<string, string> = {
       'черновик': 'Черновик',
       'сформирована': 'Сформирована',
       'отклонена': 'Отклонена',
-      'завершена': 'Завершена'
+      'завершена': 'Завершена',
+      'одобрена': 'Одобрена'
     };
     
     return statusMap[status.toLowerCase()] || status;
+  };
+
+  // Функция для определения цвета статуса
+  const getStatusColor = (status?: string) => {
+    if (!status) return 'secondary';
+    
+    switch (status.toLowerCase()) {
+      case 'черновик':
+        return 'secondary';
+      case 'сформирована':
+        return 'warning';
+      case 'одобрена':
+        return 'success';
+      case 'отклонена':
+        return 'danger';
+      case 'завершена':
+        return 'primary';
+      default: 
+        return 'secondary';
+    }
   };
 
   const formatDate = (dateString?: string) => {
@@ -147,41 +275,39 @@ export const ProgramsPage: FC = () => {
     }
   };
 
+  // Фильтрация по логину создателя на фронтенде
+  const filteredPrograms = Array.isArray(programs) ? programs.filter(program => {
+    if (!filters.creator_login) return true;
+    return program.creator_login?.toLowerCase().includes(filters.creator_login.toLowerCase());
+  }) : [];
+
   // Сортировка данных
-  const sortedPrograms = Array.isArray(programs) 
-    ? [...programs].sort((a, b) => {
-        if (!sortConfig) return 0;
+  const sortedPrograms = [...filteredPrograms].sort((a, b) => {
+    if (!sortConfig) return 0;
 
-        let aValue: any, bValue: any;
-        
-        if (sortConfig.key === 'id') {
-          aValue = a.id || 0;
-          bValue = b.id || 0;
-        } else if (sortConfig.key === 'status') {
-          aValue = a.status || '';
-          bValue = b.status || '';
-        } else if (sortConfig.key === 'created_at') {
-          aValue = a.date_create || '';
-          bValue = b.date_create || '';
-        } else if (sortConfig.key === 'updated_at') {
-          aValue = a.date_update || '';
-          bValue = b.date_update || '';
-        } else if (sortConfig.key === 'init_t1') {
-          aValue = a.init_t1 || 0;
-          bValue = b.init_t1 || 0;
-        } else if (sortConfig.key === 'init_t2') {
-          aValue = a.init_t2 || 0;
-          bValue = b.init_t2 || 0;
-        } else if (sortConfig.key === 'creator') {
-          aValue = a.creator_login || '';
-          bValue = b.creator_login || '';
-        }
+    let aValue: any, bValue: any;
+    
+    if (sortConfig.key === 'id') {
+      aValue = a.id || 0;
+      bValue = b.id || 0;
+    } else if (sortConfig.key === 'status') {
+      aValue = a.status || '';
+      bValue = b.status || '';
+    } else if (sortConfig.key === 'created_at') {
+      aValue = a.date_create || '';
+      bValue = b.date_create || '';
+    } else if (sortConfig.key === 'updated_at') {
+      aValue = a.date_update || '';
+      bValue = b.date_update || '';
+    } else if (sortConfig.key === 'creator') {
+      aValue = a.creator_login || '';
+      bValue = b.creator_login || '';
+    }
 
-        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-        return 0;
-      })
-    : [];
+    if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
 
   // Пагинация
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -199,17 +325,15 @@ export const ProgramsPage: FC = () => {
   };
 
   // Проверяем, применены ли какие-либо фильтры
-  const hasActiveFilters = filters.status || filters.start_date || filters.end_date;
+  const hasActiveFilters = filters.status || filters.start_date || filters.end_date || filters.creator_login;
 
   // Обновляем опции фильтра по статусу
   const statusOptions = [
     { value: '', label: 'Все статусы' },
     { value: 'черновик', label: 'Черновик' },
     { value: 'сформирована', label: 'Сформирована' },
-    { value: 'ожидает проверки', label: 'Ожидает проверки' },
     { value: 'одобрена', label: 'Одобрена' },
     { value: 'отклонена', label: 'Отклонена' },
-    { value: 'в работе', label: 'В работе' },
     { value: 'завершена', label: 'Завершена' }
   ];
 
@@ -225,7 +349,7 @@ export const ProgramsPage: FC = () => {
           {/* Заголовок страницы и кнопки действий */}
           <div className="page-header">
             <div className="header-left">
-              <h1>Программы</h1>
+              <h1>Программы {isModerator && <p>(Модератор)</p>}</h1>
               {isAuthenticated && user && (
                 <Badge bg="light" text="dark" className="user-badge">
                   {user.login}
@@ -233,7 +357,6 @@ export const ProgramsPage: FC = () => {
               )}
             </div>
             <div className="header-right">
-              {/* Убрана кнопка "Новая программа" */}
               <CartIcon 
                 count={cartCount} 
                 onClick={handleCartClick}
@@ -251,7 +374,7 @@ export const ProgramsPage: FC = () => {
             </Card.Header>
             <Card.Body>
               <Row className="g-3">
-                <Col md={4}>
+                <Col md={3}>
                   <Form.Group>
                     <Form.Label>Статус</Form.Label>
                     <Form.Select 
@@ -267,13 +390,13 @@ export const ProgramsPage: FC = () => {
                   </Form.Group>
                 </Col>
                 
-                <Col md={4}>
+                <Col md={3}>
                   <Form.Group>
                     <Form.Label>Дата с</Form.Label>
                     <Form.Control 
                       type="date"
                       value={filters.start_date}
-                      onChange={(e) => setFilters(prev => ({ ...prev, start_date: e.target.value }))}
+                      onChange={(e) => setFilters(prev => ({ ...prev, start_date: formatDate(e.target.value) }))}
                     />
                     <Form.Text className="text-muted">
                       Формат: ДД.ММ.ГГГГ
@@ -281,17 +404,29 @@ export const ProgramsPage: FC = () => {
                   </Form.Group>
                 </Col>
                 
-                <Col md={4}>
+                <Col md={3}>
                   <Form.Group>
                     <Form.Label>Дата по</Form.Label>
                     <Form.Control 
                       type="date"
                       value={filters.end_date}
-                      onChange={(e) => setFilters(prev => ({ ...prev, end_date: e.target.value }))}
+                      onChange={(e) => setFilters(prev => ({ ...prev, end_date: formatDate(e.target.value) }))}
                     />
                     <Form.Text className="text-muted">
                       Формат: ДД.ММ.ГГГГ
                     </Form.Text>
+                  </Form.Group>
+                </Col>
+                
+                <Col md={3}>
+                  <Form.Group>
+                    <Form.Label>Создатель</Form.Label>
+                    <Form.Control 
+                      type="text"
+                      value={filters.creator_login}
+                      onChange={(e) => setFilters(prev => ({ ...prev, creator_login: e.target.value }))}
+                      placeholder="Логин создателя"
+                    />
                   </Form.Group>
                 </Col>
                 
@@ -333,6 +468,7 @@ export const ProgramsPage: FC = () => {
                         {filters.status && ` Статус: ${filters.status}`}
                         {filters.start_date && ` Дата с: ${filters.start_date}`}
                         {filters.end_date && ` Дата по: ${filters.end_date}`}
+                        {filters.creator_login && ` Создатель: ${filters.creator_login}`}
                       </small>
                     </div>
                   )}
@@ -357,10 +493,10 @@ export const ProgramsPage: FC = () => {
             </div>
           ) : (
             <>
-              {Array.isArray(programs) && programs.length > 0 && (
+              {sortedPrograms.length > 0 && (
                 <div className="mb-3 d-flex justify-content-between align-items-center">
                   <div className="total-info">
-                    Найдено программ: <strong>{programs.length}</strong>
+                    Найдено программ: <strong>{sortedPrograms.length}</strong>
                     {hasActiveFilters && (
                       <Badge bg="warning" text="dark" className="ms-2">
                         Применены фильтры
@@ -400,15 +536,17 @@ export const ProgramsPage: FC = () => {
                   <tbody>
                     {currentPrograms.length > 0 ? (
                       currentPrograms.map((program) => (
-                        <tr key={program.id} className="program-row">
+                        <tr key={program.id || Math.random()} className="program-row">
                           <td className="id-cell">
-                            <strong>#{program.id}</strong>
+                            <strong>#{program.id || 'N/A'}</strong>
                           </td>
                           <td className="status-cell">
-                            {/* Убраны цветные рамки - просто текст статуса */}
-                            <span className="status-text">
-                              {getStatusDisplay(program.status || '')}
-                            </span>
+                            <Badge 
+                              bg={getStatusColor(program.status)}
+                              className="status-badge"
+                            >
+                              {getStatusDisplay(program.status)}
+                            </Badge>
                           </td>
                           <td className="date-cell">
                             {formatDate(program.date_create)}
@@ -417,7 +555,7 @@ export const ProgramsPage: FC = () => {
                             {formatDate(program.date_update)}
                           </td>
                           <td className="creator-cell">
-                            {program.creator_login}
+                            {program.creator_login || 'Не указан'}
                             {program.moderator_login && program.moderator_login !== program.creator_login && (
                               <div className="text-muted small">
                                 Проверил: {program.moderator_login}
@@ -425,15 +563,26 @@ export const ProgramsPage: FC = () => {
                             )}
                           </td>
                           <td className="actions-cell">
-                            <Button 
-                              variant="outline-primary" 
-                              size="sm"
-                              onClick={() => program.id && handleViewProgram(program.id)}
-                              className="action-btn"
-                              disabled={!program.id}
-                            >
-                              Просмотр
-                            </Button>
+                            <div className="d-flex gap-2">
+                              <Button 
+                                variant="outline-primary" 
+                                size="sm"
+                                onClick={() => program.id && handleViewProgram(program.id)}
+                                className="action-btn"
+                                disabled={!program.id}
+                              >
+                                Просмотр
+                              </Button>
+                              {isModerator && program.status === 'сформирована' && (
+                                <Button 
+                                  variant="warning" 
+                                  size="sm"
+                                  onClick={() => handleModerateProgram(program)}
+                                >
+                                  Модерировать
+                                </Button>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))
@@ -521,6 +670,50 @@ export const ProgramsPage: FC = () => {
               )}
             </>
           )}
+
+          {/* Модальное окно модерации */}
+          <Modal show={showModerateModal} onHide={() => setShowModerateModal(false)}>
+            <Modal.Header closeButton>
+              <Modal.Title>Модерация программы #{selectedProgram?.id}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p><strong>Создатель:</strong> {selectedProgram?.creator_login || 'Не указан'}</p>
+              <p><strong>Дата создания:</strong> {formatDate(selectedProgram?.date_create)}</p>
+              <p><strong>Текущий статус:</strong> {getStatusDisplay(selectedProgram?.status)}</p>
+              
+              <div className="mt-3">
+                <Form.Group>
+                  <Form.Label><strong>Решение модерации:</strong></Form.Label>
+                  <div className="d-flex gap-3 mt-2">
+                    <Button 
+                      variant={moderationDecision === 'approve' ? 'success' : 'outline-success'}
+                      onClick={() => setModerationDecision('approve')}
+                    >
+                      Одобрить
+                    </Button>
+                    <Button 
+                      variant={moderationDecision === 'reject' ? 'danger' : 'outline-danger'}
+                      onClick={() => setModerationDecision('reject')}
+                    >
+                      Отклонить
+                    </Button>
+                  </div>
+                </Form.Group>
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowModerateModal(false)}>
+                Отмена
+              </Button>
+              <Button 
+                variant="primary" 
+                onClick={handleConfirmModeration}
+                disabled={!moderationDecision}
+              >
+                Применить решение
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       </Container>
     </div>

@@ -234,6 +234,12 @@ export const CommandsPage: FC = () => {
         </Row>
       </Container>
 
+      {draftError && (
+        <Alert variant="danger" className="mb-3">
+          Ошибка загрузки корзины: {draftError}
+        </Alert>
+      )}
+
       {/* Commands Grid */}
       <Container fluid className="commands-container">
         {displayError && !useMockData && (
@@ -247,12 +253,6 @@ export const CommandsPage: FC = () => {
             >
               Использовать демо-данные
             </Button>
-          </Alert>
-        )}
-
-        {draftError && (
-          <Alert variant="danger" className="mb-3">
-            Ошибка загрузки корзины: {draftError}
           </Alert>
         )}
 
