@@ -78,3 +78,15 @@ export const getAllCommands = async (query?: string): Promise<Command[]> => {
       return data.data;
     });
 };
+
+export const getProgramCartCount = async (): Promise<number> => {
+  try {
+    const response = await fetch("/api/programs/cart-icon");
+    if (!response.ok) throw new Error('API request failed');
+    const data = await response.json();
+    return data.count || 0;
+  } catch (error) {
+    console.warn('Failed to get cart count:', error);
+    return 0;
+  }
+};
