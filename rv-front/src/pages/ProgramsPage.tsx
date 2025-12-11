@@ -349,7 +349,7 @@ export const ProgramsPage: FC = () => {
           {/* Заголовок страницы и кнопки действий */}
           <div className="page-header">
             <div className="header-left">
-              <h1>Программы {isModerator && <p>(Модератор)</p>}</h1>
+              <h1>Программы {isModerator && <span>(Модератор)</span>}</h1>
               {isAuthenticated && user && (
                 <Badge bg="light" text="dark" className="user-badge">
                   {user.login}
