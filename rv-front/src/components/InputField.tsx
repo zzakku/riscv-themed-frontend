@@ -5,7 +5,7 @@ import './InputField.css'
 import { useDispatch } from 'react-redux'; 
 import { type AppDispatch } from '../store/store';
 import { getCommands } from '../store/slices/commandSlice';
-import { setSearchQuery } from '../store/filterSlice';
+import { setSearchQuery } from '../store/slices/filterSlice';
 
 interface Props {
     value: string

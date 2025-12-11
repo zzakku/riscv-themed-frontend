@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import filterReducer from './filterSlice';
+import filterReducer from './slices/filterSlice';
 import userReducer from './slices/userSlice';
 import commandsReducers from './slices/commandSlice'
 import programsReducer from './slices/programSlice'

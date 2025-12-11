@@ -19,7 +19,7 @@ import { Navigation } from "../components/Navigation";
 import { COMMANDS_MOCK } from "../modules/mock";
 
 import { useAppSelector, useAppDispatch } from '../store/hooks';
-import { setSearchQuery } from '../store/filterSlice';
+import { setSearchQuery } from '../store/slices/filterSlice';
 import { type RootState } from '../store/store';
 import { getCommands } from '../store/slices/commandSlice';
 import { 

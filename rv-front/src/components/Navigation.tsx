@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
 import { type AppDispatch, type RootState } from '../store/store';
 import { logoutUser } from '../store/slices/userSlice'; 
-import { setSearchQuery } from '../store/filterSlice'; 
+import { setSearchQuery } from '../store/slices/filterSlice'; 
 import { ROUTES } from "../Routes";
 import { clearDraft } from "../store/slices/programDraftSlice";
 
