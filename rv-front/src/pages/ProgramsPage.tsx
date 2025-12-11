@@ -57,7 +57,7 @@ export const ProgramsPage: FC = () => {
   const [isPolling, setIsPolling] = useState(false);
   const pollingRef = useRef<number | null>(null);
 
-  // Проверяем, является ли пользователь модератором
+  // Проверяем, является ли пользователь ревьюером
   const isModerator = user?.is_moderator || false;
 
   // Функция для загрузки данных с фильтрами
@@ -91,7 +91,7 @@ export const ProgramsPage: FC = () => {
     
     loadData();
     
-    // Запускаем polling только для модераторов
+    // Запускаем polling только для ревьюеров
     if (isModerator) {
       setIsPolling(true);
     }
@@ -349,7 +349,7 @@ export const ProgramsPage: FC = () => {
           {/* Заголовок страницы и кнопки действий */}
           <div className="page-header">
             <div className="header-left">
-              <h1>Программы {isModerator && <span>(Модератор)</span>}</h1>
+              <h1>Программы {isModerator && <span>(Ревьюер)</span>}</h1>
               {isAuthenticated && user && (
                 <Badge bg="light" text="dark" className="user-badge">
                   {user.login}

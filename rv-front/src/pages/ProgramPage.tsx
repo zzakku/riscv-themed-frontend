@@ -398,7 +398,7 @@ export const ProgramPage: FC = () => {
               )}
               {adaptedData.program.moderator_login && (
                 <span className="moderator-info ms-3">
-                  Модератор: {adaptedData.program.moderator_login}
+                  Ревьюер: {adaptedData.program.moderator_login}
                 </span>
               )}
               {cartCount > 0 && isDraftForCurrentUser && (

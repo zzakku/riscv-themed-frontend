@@ -131,7 +131,7 @@ export const Navigation: FC = () => {
                     <div className="nav__mobile-user-info">
                       <div className="nav__mobile-user-name">{user.login}</div>
                       <div className="nav__mobile-user-role">
-                        {user.is_moderator ? 'Модератор' : 'Пользователь'}
+                        {user.is_moderator ? 'Ревьюер' : 'Пользователь'}
                       </div>
                     </div>
                     <Nav.Link 

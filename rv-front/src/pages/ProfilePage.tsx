@@ -154,7 +154,7 @@ export const ProfilePage = () => {
               <div className="detail-row">
                 <div className="detail-label">Роль:</div>
                 <div className="detail-value role-display">
-                  {user?.is_moderator ? 'Модератор' : 'Пользователь'}
+                  {user?.is_moderator ? 'Ревьюер' : 'Пользователь'}
                 </div>
               </div>
             </div>
