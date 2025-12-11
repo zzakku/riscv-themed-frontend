@@ -26,3 +26,7 @@ dist-ssr
 # mkcert private keys
 ca.key
 cert.key
+
+# Tauri source files
+
+src-tauri
