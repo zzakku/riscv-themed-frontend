@@ -23,8 +23,12 @@ export default defineConfig({
       //   target: "https://1afa8552089991.lhr.life",
       //   changeOrigin: true,
       // },
-      '/rvimg': {
-        target: 'http://10.146.21.222:9000',
+       "/api": {
+         target: "http://localhost:8081",
+         changeOrigin: true,
+       },
+      '/minio': {
+        target: 'http://localhost:8081',
         changeOrigin: true,
         secure: false,
       }
