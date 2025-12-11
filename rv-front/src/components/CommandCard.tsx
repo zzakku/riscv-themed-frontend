@@ -1,6 +1,7 @@
 import { type FC } from 'react'
 import { Card, Button, Spinner } from 'react-bootstrap'
 import "./CommandCard.css"
+import defaultImage1 from "../assets/1.png";
 
 interface Props {
     id?: number
@@ -60,7 +61,7 @@ export const CommandCard: FC<Props> = ({
                 className="custom-card-image"
                 alt={comName}
                 onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/placeholder-image.png';
+                    (e.target as HTMLImageElement).src = defaultImage1;
                 }}
             />
             

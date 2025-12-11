@@ -25,6 +25,7 @@ import {
   deleteDraftProgram,
   updateCommandOperand 
 } from "../store/slices/programDraftSlice";
+import defaultImage1 from "../assets/1.png";
 
 // Интерфейс для адаптированного ответа API
 interface AdaptedCommandWithOperand {
@@ -277,6 +278,14 @@ export const ProgramPage: FC = () => {
   const confirmDelete = () => {
     setShowDeleteModal(true);
   };
+
+    const processImageUrl = (url: string | undefined) => {
+        if (!url) return '';
+
+        let processedUrl = url.replace('9000','8081/minio');
+
+        return processedUrl;
+    };
 
   if (loading) {
     return (
@@ -535,11 +544,11 @@ export const ProgramPage: FC = () => {
                 <Col className="table-cell">
                   {command.img && (
                     <img 
-                      src={command.img} 
+                      src={processImageUrl(command.img)} 
                       alt={command.com_name}
                       className="command-image"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
+                        (e.target as HTMLImageElement).src = defaultImage1;
                       }}
                     />
                   )}
