@@ -1,5 +1,5 @@
 import { type FC } from 'react'
-import { Card, Button, Form } from 'react-bootstrap'
+import { Card, Button } from 'react-bootstrap'
 import "./CommandCard.css"
 
 interface Props {
@@ -14,19 +14,13 @@ interface Props {
 }
 
 export const CommandCard: FC<Props> = ({ 
-    id, 
     img, 
     comName, 
     fmt, 
     rsNum, 
     rdNum, 
-    onDetailsClick, 
-    onAddToProgram 
+    onDetailsClick,
 }) => {
-    const handleAddToProgram = (e: React.FormEvent) => {
-        e.preventDefault();
-        onAddToProgram();
-    };
 
     return (
         <Card className="custom-command-card">
@@ -65,16 +59,6 @@ export const CommandCard: FC<Props> = ({
                     Подробнее
                 </Button>
                 
-                <Form onSubmit={handleAddToProgram} className="w-100">
-                    <input type="hidden" name="command_id" value={id} />
-                    <Button 
-                        type="submit" 
-                        className="custom-card-btn my-btn" 
-                        variant="outline-primary"
-                    >
-                        Добавить в программу
-                    </Button>
-                </Form>
             </Card.Body>
         </Card>
     );
