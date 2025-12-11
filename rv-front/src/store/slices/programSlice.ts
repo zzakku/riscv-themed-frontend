@@ -106,9 +106,15 @@ export const updateProgram = createAsyncThunk(
         return rejectWithValue('Требуется авторизация');
       }
 
+      // Убедитесь, что значения 0 передаются явно
+      const payload = {
+        init_t1: updateData.init_t1 ?? 0,
+        init_t2: updateData.init_t2 ?? 0
+      };
+
       const response = await api.api.programsUpdate(
         programId, 
-        updateData, 
+        payload, 
         {
           headers: {
             Authorization: `Bearer ${token}`
