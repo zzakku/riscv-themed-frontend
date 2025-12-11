@@ -263,6 +263,10 @@ export const ProgramPage: FC = () => {
         operand 
       })).unwrap();
       
+    if (adaptedData?.program?.id) {
+      await dispatch(getProgram(adaptedData.program.id));
+    }
+
       setUpdateSuccess(`Операнд для команды обновлен`);
       setUpdateError(null);
     } catch (error: any) {
