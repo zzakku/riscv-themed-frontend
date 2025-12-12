@@ -23,7 +23,9 @@ import {
 } from "../store/slices/programSlice";
 import { 
   deleteDraftProgram,
-  updateCommandOperand 
+  updateCommandOperand,
+  removeCommandFromProgram,
+  getDraftProgram
 } from "../store/slices/programDraftSlice";
 
 // Интерфейс для адаптированного ответа API
@@ -93,6 +95,51 @@ export const ProgramPage: FC = () => {
   const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [updatingOperandId, setUpdatingOperandId] = useState<number | null>(null);
+
+  //  состояния для модального окна удаления команды
+  const [deletingCommandId, setDeletingCommandId] = useState<number | null>(null);
+  const [showDeleteCommandModal, setShowDeleteCommandModal] = useState(false);
+  const [commandToDelete, setCommandToDelete] = useState<number | null>(null);
+  const [commandToDeleteName, setCommandToDeleteName] = useState<string>('');
+
+  // Функция для открытия модального окна удаления
+  const confirmDeleteCommand = (commandId: number, commandName: string) => {
+    setCommandToDelete(commandId);
+    setCommandToDeleteName(commandName);
+    setShowDeleteCommandModal(true);
+  };
+
+  // функция удаления
+const handleRemoveCommand = async () => {
+    if (!commandToDelete || !canEditProgram || !adaptedData?.program?.id) {
+      setUpdateError("Нельзя удалить команду из этой программы");
+      setShowDeleteCommandModal(false);
+      return;
+    }
+    
+    setDeletingCommandId(commandToDelete);
+    
+    try {
+      await dispatch(removeCommandFromProgram({ commandId: commandToDelete })).unwrap();
+      
+      // Обновляем данные программы после удаления команды
+      await dispatch(getProgram(adaptedData.program.id)).unwrap();
+      
+      // Обновляем состояние черновика
+      await dispatch(getDraftProgram()).unwrap();
+      
+      setUpdateSuccess(`Команда "${commandToDeleteName}" успешно удалена из программы`);
+      setUpdateError(null);
+    } catch (error: any) {
+      setUpdateError(error.message || "Ошибка при удалении команды");
+      setUpdateSuccess(null);
+    } finally {
+      setDeletingCommandId(null);
+      setCommandToDelete(null);
+      setCommandToDeleteName('');
+      setShowDeleteCommandModal(false);
+    }
+  };
 
   // Адаптируем данные из API
   const adaptedData: AdaptedProgramData | null = useMemo(() => {
@@ -373,6 +420,35 @@ export const ProgramPage: FC = () => {
         </Modal.Footer>
       </Modal>
 
+      <Modal show={showDeleteCommandModal} onHide={() => setShowDeleteCommandModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Подтверждение удаления команды</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Вы уверены, что хотите удалить команду "{commandToDeleteName}" из программы? 
+          Это действие нельзя отменить.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteCommandModal(false)}>
+            Отмена
+          </Button>
+          <Button 
+            variant="danger" 
+            onClick={handleRemoveCommand}
+            disabled={deletingCommandId === commandToDelete}
+          >
+            {deletingCommandId === commandToDelete ? (
+              <>
+                <Spinner animation="border" size="sm" className="me-2" />
+                Удаление...
+              </>
+            ) : (
+              'Удалить'
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       {/* Breadcrumbs */}
       <Container fluid className="breadcrumbs-section">
         <BreadCrumbs crumbs={[
@@ -577,18 +653,32 @@ export const ProgramPage: FC = () => {
                 </Col>
                 {canEditProgram && (
                   <Col className="table-cell">
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={() => handleUpdateOperand(commandId, currentOperand)}
-                      disabled={updatingOperandId === commandId}
-                    >
-                      {updatingOperandId === commandId ? (
-                        <Spinner animation="border" size="sm" />
-                      ) : (
-                        'Сохранить'
-                      )}
-                    </Button>
+                    <div className="d-flex gap-2">
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        onClick={() => handleUpdateOperand(commandId, currentOperand)}
+                        disabled={updatingOperandId === commandId}
+                      >
+                        {updatingOperandId === commandId ? (
+                          <Spinner animation="border" size="sm" />
+                        ) : (
+                          'Сохранить'
+                        )}
+                      </Button>
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          onClick={() => confirmDeleteCommand(commandId, command.com_name || 'эта команда')}
+                          disabled={deletingCommandId === commandId}
+                        >
+                          {deletingCommandId === commandId ? (
+                            <Spinner animation="border" size="sm" />
+                          ) : (
+                            'Удалить'
+                          )}
+                        </Button>
+                    </div>
                   </Col>
                 )}
               </Row>
