@@ -23,7 +23,9 @@ import {
 } from "../store/slices/programSlice";
 import { 
   deleteDraftProgram,
-  updateCommandOperand 
+  updateCommandOperand,
+  removeCommandFromProgram,
+  getDraftProgram
 } from "../store/slices/programDraftSlice";
 import defaultImage1 from "../assets/1.png";
 
@@ -94,6 +96,36 @@ export const ProgramPage: FC = () => {
   const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [updatingOperandId, setUpdatingOperandId] = useState<number | null>(null);
+  const [deletingCommandId, setDeletingCommandId] = useState<number | null>(null);
+
+  // Функция для удаления команды из программы
+  const handleRemoveCommand = async (commandId: number) => {
+    if (!canEditProgram || !adaptedData?.program?.id) {
+      setUpdateError("Нельзя удалить команду из этой программы");
+      return;
+    }
+    
+    setDeletingCommandId(commandId);
+    
+    try {
+      await dispatch(removeCommandFromProgram({ commandId })).unwrap();
+      
+      // Обновляем данные программы после удаления команды
+      await dispatch(getProgram(adaptedData.program.id)).unwrap();
+      
+      // Обновляем состояние черновика
+      await dispatch(getDraftProgram()).unwrap();
+      
+      setUpdateSuccess("Команда успешно удалена из программы");
+      setUpdateError(null);
+    } catch (error: any) {
+      setUpdateError(error.message || "Ошибка при удалении команды");
+      setUpdateSuccess(null);
+    } finally {
+      setDeletingCommandId(null);
+    }
+  };
+
 
   // Адаптируем данные из API
   const adaptedData: AdaptedProgramData | null = useMemo(() => {
@@ -592,6 +624,18 @@ export const ProgramPage: FC = () => {
                         <Spinner animation="border" size="sm" />
                       ) : (
                         'Сохранить'
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      onClick={() => handleRemoveCommand(commandId)}
+                      disabled={deletingCommandId === commandId}
+                    >
+                      {deletingCommandId === commandId ? (
+                        <Spinner animation="border" size="sm" />
+                      ) : (
+                        'Удалить'
                       )}
                     </Button>
                   </Col>
