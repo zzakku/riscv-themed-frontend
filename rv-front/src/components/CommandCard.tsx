@@ -2,6 +2,9 @@ import { type FC } from 'react'
 import { Card, Button, Spinner } from 'react-bootstrap'
 import "./CommandCard.css"
 import defaultImage1 from "../assets/1.png";
+import { useSelector } from 'react-redux';
+import { type RootState } from '../store/store';
+
 
 interface Props {
     id?: number
@@ -27,6 +30,8 @@ export const CommandCard: FC<Props> = ({
     isAddingToProgram = false,
     disabled = false
 }) => {
+
+  const { isAuthenticated } = useSelector((state: RootState) => state.users);
 
     const processImageUrl = (url: string | undefined) => {
         if (!url) return '';
@@ -93,10 +98,11 @@ export const CommandCard: FC<Props> = ({
                 >
                     Подробнее
                 </Button>
+                {isAuthenticated && (
                 <Button 
                     className="custom-card-btn my-btn" 
                     onClick={onAddToProgram}
-                    disabled={disabled || isAddingToProgram}
+                    disabled={disabled || isAddingToProgram || !isAuthenticated}
                 >
                     {isAddingToProgram ? (
                         <>
@@ -112,6 +118,7 @@ export const CommandCard: FC<Props> = ({
                         </>
                     ) : 'Добавить в программу'}
                 </Button>
+                )}
             </Card.Body>
         </Card>
     );
