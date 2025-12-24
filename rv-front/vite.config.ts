@@ -5,6 +5,7 @@ import mkcert from 'vite-plugin-mkcert'
 import fs from 'fs';
 import path from 'path';
 import { BASE_PATH } from "./src/target_config"
+import { internalIpV4 } from "internal-ip";
 
 // Для локальной работы:
 
@@ -39,6 +40,16 @@ export default defineConfig({
 //    host: true, // нужно, чтобы правильно работал маппинг портов в docker-контейнере
     strictPort: true, // необязательно
     port: 3000,
+    host: "0.0.0.0",
+    hmr: {
+      protocol: "ws",
+      host: await internalIpV4(),
+      port: 3000,
+    },
+    watch: {
+      // 3. tell vite to ignore watching `src-tauri`
+      ignored: ["**/src-tauri/**"],
+    },
     https:{
       key: fs.readFileSync(path.resolve(__dirname, 'cert.key')),
       cert: fs.readFileSync(path.resolve(__dirname, 'cert.crt')),

@@ -9,5 +9,5 @@ export const getApiBaseUrl = (): string => {
 };
 
 export const getTauriApiBaseUrl = (): string => {
-  return 'http://10.146.21.222:8081';
+  return 'http://192.168.1.37:8081';
 };

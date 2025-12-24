@@ -55,7 +55,7 @@ export interface ErrorResponse {
   description: string;
 }
 
-const isTauri = typeof window !== 'undefined' && (window as any).TAURI !== undefined;
+const isTauri = '__TAURI_INTERNALS__' in window
 
 const API_BASE = getApiBaseUrl();
 
@@ -81,6 +81,10 @@ export const getCommandById = async (id: number): Promise<Command> => {
     }
     
     const data = await response.json();
+
+    // локальные ссылки заменяем
+    data.data.img = data.data.img.replace('127.0.0.1:9000','192.168.1.37:8081/minio');
+
     return data.data;
   } catch (error) {
     console.error('API Error:', error);

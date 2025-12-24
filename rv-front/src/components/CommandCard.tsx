@@ -42,7 +42,7 @@ export const CommandCard: FC<Props> = ({
         
         // return processedUrl;
 
-        let processedUrl = url.replace('9000','8081/minio');
+        let processedUrl = url.replace('127.0.0.1:9000','192.168.1.37:8081/minio');
 
         return processedUrl;
     };

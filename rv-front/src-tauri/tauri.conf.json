@@ -1,11 +1,11 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "rv-front",
+  "productName": "RISC-V Assembly",
   "version": "0.1.0",
   "identifier": "com.zzakku.rvwebappclient",
   "build": {
     "frontendDist": "../dist",
-    "devUrl": "https://10.146.21.222:3000",
+    "devUrl": "https://localhost:3000",
     "beforeDevCommand": "npm run dev -- --host",
     "beforeBuildCommand": "npm run build"
   },

@@ -10,13 +10,17 @@
     "preview": "vite preview",
     "deploy": "gh-pages -d dist",
     "tauri": "tauri",
-    "tauri:build:debug": "tauri build --debug"
+    "tauri:build:debug": "tauri build --debug",
+    "tauri:build:dev:adnroid": "tauri android dev --root-certificate-path rv-front// --port 3000",
+    "tauri:build:android": "tauri android build --apk true -t aarch64 -v",
+    "tauri:build:android:debug": "tauri android build --apk true -t aarch64 -v -d"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.10.1",
     "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
     "gh-pages": "^6.3.0",
+    "internal-ip": "^8.0.1",
     "react": "^19.1.1",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.1.1",
@@ -26,8 +30,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
-    "@tauri-apps/api": "^2.9.0",
-    "@tauri-apps/cli": "^2.9.4",
+    "@tauri-apps/api": "^2.9.1",
+    "@tauri-apps/cli": "^2.9.6",
     "@tauri-apps/plugin-http": "^2.5.4",
     "@types/node": "^24.10.1",
     "@types/react": "^19.1.16",
