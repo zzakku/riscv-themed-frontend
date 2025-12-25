@@ -644,19 +644,17 @@ export const ProgramPage: FC = () => {
       </Container>
 
       {/* Results */}
-      {(adaptedData.program.res_t1 !== null || adaptedData.program.res_t2 !== null) && (
-        <Container fluid className="results-section">
-          <Row>
-            <Col>
-              <p className="section-caption">Результат</p>
-              <div className="result-box">
-                t1: 0x{(adaptedData.program.res_t1 || 0).toString(16).toUpperCase().padStart(2, '0')}, 
-                t2: 0x{(adaptedData.program.res_t2 || 0).toString(16).toUpperCase().padStart(2, '0')}
-              </div>
-            </Col>
-          </Row>
-        </Container>
-      )}
+      <Container fluid className="results-section">
+        <Row>
+          <Col>
+            <p className="section-caption">Результат</p>
+            <div className="result-box">
+              t1: 0x{(adaptedData.program.res_t1 || 0).toString(16).toUpperCase().padStart(2, '0')}, 
+              t2: 0x{(adaptedData.program.res_t2 || 0).toString(16).toUpperCase().padStart(2, '0')}
+            </div>
+          </Col>
+        </Row>
+      </Container>
 
       {/* Program Info */}
       <Container fluid className="info-section">
