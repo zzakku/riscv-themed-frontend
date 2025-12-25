@@ -47,7 +47,7 @@ export const Navigation: FC = () => {
 
   // Обработчик перехода в программы
   const handleProgramsClick = () => {
-    navigate(ROUTES.PROGRAMS); // Предполагается, что ROUTES.PROGRAMS определен
+    navigate(ROUTES.PROGRAMS);
     setIsMobileMenuOpen(false);
   };
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Container, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { registerUser, clearError } from '../store/slices/userSlice';
+import { registerUser, logoutUser, clearError } from '../store/slices/userSlice';
 import { ROUTES } from '../Routes';
 import './AuthPages.css';
 
@@ -21,7 +21,17 @@ export const RegisterPage = () => {
   const { loading, error, isAuthenticated } = useAppSelector((state) => state.users);
 
   useEffect(() => {
-    dispatch(clearError());
+    // Автоматический выход при заходе на страницу логина
+    const performAutoLogout = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        // Выполняем выход без ожидания и без блокировки UI
+        dispatch(logoutUser());
+      }
+      dispatch(clearError());
+    };
+
+    performAutoLogout();
   }, [dispatch]);
 
   useEffect(() => {
