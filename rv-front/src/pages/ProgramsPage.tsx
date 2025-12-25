@@ -250,6 +250,34 @@ export const ProgramsPage: FC = () => {
     );
   };
 
+  // Функция для отображения начальных значений
+  const renderInitialValues = (init_t1?: number, init_t2?: number) => {
+    // Проверяем, есть ли начальные значения (не NULL)
+    const hasInitialValues = init_t1 !== null && init_t1 !== undefined && 
+                           init_t2 !== null && init_t2 !== undefined;
+    
+    if (!hasInitialValues) {
+      return (
+        <span className="text-muted fst-italic" style={{ fontSize: '0.9em' }}>
+          Не инициализированы
+        </span>
+      );
+    }
+    
+    return (
+      <div className="initial-values">
+        <div className="init-values">
+          <Badge bg="light" text="dark" className="me-1">
+            T1: {init_t1}
+          </Badge>
+          <Badge bg="light" text="dark">
+            T2: {init_t2}
+          </Badge>
+        </div>
+      </div>
+    );
+  };
+
   // Сортировка данных
   const sortedPrograms = Array.isArray(programs) 
     ? [...programs].sort((a, b) => {
@@ -270,11 +298,11 @@ export const ProgramsPage: FC = () => {
           aValue = a.date_update || '';
           bValue = b.date_update || '';
         } else if (sortConfig.key === 'init_t1') {
-          aValue = a.init_t1 || 0;
-          bValue = b.init_t1 || 0;
+          aValue = a.init_t1 !== null && a.init_t1 !== undefined ? a.init_t1 : -1;
+          bValue = b.init_t1 !== null && b.init_t1 !== undefined ? b.init_t1 : -1;
         } else if (sortConfig.key === 'init_t2') {
-          aValue = a.init_t2 || 0;
-          bValue = b.init_t2 || 0;
+          aValue = a.init_t2 !== null && a.init_t2 !== undefined ? a.init_t2 : -1;
+          bValue = b.init_t2 !== null && b.init_t2 !== undefined ? b.init_t2 : -1;
         } else if (sortConfig.key === 'creator') {
           aValue = a.creator_login || '';
           bValue = b.creator_login || '';
@@ -340,7 +368,6 @@ export const ProgramsPage: FC = () => {
               )}
             </div>
             <div className="header-right">
-              {/* Убрана кнопка "Новая программа" */}
               <CartIcon 
                 count={cartCount} 
                 onClick={handleCartClick}
@@ -489,7 +516,12 @@ export const ProgramsPage: FC = () => {
                       <th className="sortable" onClick={() => handleSort('creator')}>
                         Автор {renderSortIcon('creator')}
                       </th>
-                      <th>Результат</th>
+                      <th className="sortable" onClick={() => handleSort('init_t1')}>
+                        Начальные значения {renderSortIcon('init_t1')}
+                      </th>
+                      <th className="sortable" onClick={() => handleSort('result_t1')}>
+                        Результат {renderSortIcon('result_t1')}
+                      </th>
                       <th>Действия</th>
                     </tr>
                   </thead>
@@ -519,6 +551,9 @@ export const ProgramsPage: FC = () => {
                               </div>
                             )}
                           </td>
+                          <td className="initial-values-cell">
+                            {renderInitialValues(program.init_t1, program.init_t2)}
+                          </td>
                           <td className="result-cell">
                             {renderProgramResult(program.res_t1, program.res_t2)}
                           </td>
@@ -537,7 +572,7 @@ export const ProgramsPage: FC = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={7} className="no-data-cell">
+                        <td colSpan={8} className="no-data-cell">
                           <div className="no-data-content">
                             <h5>Программы не найдены</h5>
                             <p>
@@ -546,13 +581,15 @@ export const ProgramsPage: FC = () => {
                                 : 'У вас пока нет программ.'
                               }
                             </p>
-                            <Button 
-                              variant="outline-primary" 
-                              className="mt-3"
-                              onClick={handleResetFilters}
-                            >
-                              Сбросить фильтры
-                            </Button>
+                            {hasActiveFilters && (
+                              <Button 
+                                variant="outline-primary" 
+                                className="mt-3"
+                                onClick={handleResetFilters}
+                              >
+                                Сбросить фильтры
+                              </Button>
+                            )}
                             <Button 
                               variant="outline-primary" 
                               className="ms-2 mt-3"
