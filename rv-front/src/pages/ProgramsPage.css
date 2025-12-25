@@ -1,11 +1,9 @@
-/* Добавьте в конец ProgramsPage.css */
-
 /* Контент страницы */
 .programs-content {
   padding: 20px 1.5%;
 }
 
-/* Стили для заголовка страницы (повторяем для ясности) */
+/* Стили для заголовка страницы */
 .page-header {
   display: flex;
   justify-content: space-between;
