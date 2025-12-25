@@ -180,7 +180,7 @@ export const ProgramsPage: FC = () => {
   };
 
   const handleViewProgram = (programId: number) => {
-    navigate(ROUTES.PROGRAM.replace(':programId', programId.toString()));
+    navigate(ROUTES.PROGRAM.replace(':id', programId.toString()));
   };
 
   const handleSort = (key: string) => {
