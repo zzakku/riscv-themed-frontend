@@ -18,5 +18,9 @@ export const store = configureStore({
   devTools: enableDevTools,
 });
 
+export const selectCommands = (state: RootState) => state.commands.commands;
+export const selectCommandsLoading = (state: RootState) => state.commands.loading;
+export const selectCommandsError = (state: RootState) => state.commands.error;
+
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
