@@ -157,57 +157,27 @@ export const updateUserProfile = createAsyncThunk(
 
 export const logoutUser = createAsyncThunk(
   'user/logout',
-  async (_, { getState, rejectWithValue }) => {
-    try {
-      const state = getState() as { user: UserState };
-      const token = state.user.token;
-      
-      if (!token) {
-        return rejectWithValue('Требуется авторизация');
-      }
-
-      const response = await api.api.usersLogOutCreate({
-        secure: true,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      
-      return response.data;
-    } catch (error: any) {
-      // Даже если ошибка API, всё равно разлогиниваем пользователя локально
-      console.error('Ошибка при выходе:', error);
-      return { status: 'success', message: 'Вы успешно вышли из системы' };
-    }
-  }
-);
-
-// Thunk для восстановления сессии из localStorage
-export const restoreSession = createAsyncThunk(
-  'user/restoreSession',
-  async (_, { rejectWithValue, dispatch }) => {
+  async (_, { }) => {
     try {
       const token = localStorage.getItem('token');
       
-      if (!token) {
-        return rejectWithValue('Токен не найден');
-      }
-      
-      // Проверяем токен, запрашивая данные пользователя
-      const userResponse = await dispatch(getUserData(token));
-      
-      if (userResponse.type === getUserData.fulfilled.type) {
-        return {
-          token,
-          user: (userResponse.payload as any).user
-        };
+      if (token) {
+        await api.api.usersLogOutCreate({
+          secure: true,
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
       } else {
-        localStorage.removeItem('token');
-        return rejectWithValue('Сессия устарела или токен недействителен');
+        await api.api.usersLogOutCreate({
+          secure: true
+        });
       }
+      
+      return null;
     } catch (error: any) {
-      localStorage.removeItem('token');
-      return rejectWithValue('Ошибка восстановления сессии');
+      // Игнорируем ошибки - бекенд все равно считает выход успешным
+      return null;
     }
   }
 );
@@ -290,23 +260,6 @@ const userSlice = createSlice({
         state.loading = false;
         localStorage.removeItem('token');
       })
-      // Restore Session
-      .addCase(restoreSession.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(restoreSession.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.isAuthenticated = true;
-        state.error = null;
-      })
-      .addCase(restoreSession.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-        state.isAuthenticated = false;
-      });
   },
 });
 

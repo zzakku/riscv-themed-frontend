@@ -2,38 +2,37 @@ import { useState, useEffect } from 'react';
 import { Container, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { loginUser, clearError, restoreSession } from '../store/slices/userSlice';
+import { loginUser, clearError, logoutUser } from '../store/slices/userSlice';
 import { ROUTES } from '../Routes';
 import './AuthPages.css';
 
 export const LoginPage = () => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
-  const [isRestoring, setIsRestoring] = useState(true);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { loading, error, isAuthenticated } = useAppSelector((state) => state.users);
 
   useEffect(() => {
-    const restoreUserSession = async () => {
-      try {
-        await dispatch(restoreSession()).unwrap();
-      } catch (error) {
-        // Игнорируем ошибки при восстановлении
-      } finally {
-        setIsRestoring(false);
+    // Автоматический выход при заходе на страницу логина
+    const performAutoLogout = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        // Выполняем выход без ожидания и без блокировки UI
+        dispatch(logoutUser());
       }
+      dispatch(clearError());
     };
 
-    restoreUserSession();
-    dispatch(clearError());
+    performAutoLogout();
   }, [dispatch]);
 
+  // Перенаправление на страницу команд при успешной аутентификации
   useEffect(() => {
-    if (isAuthenticated && !isRestoring) {
+    if (isAuthenticated && !loading) {
       navigate(ROUTES.COMMANDS);
     }
-  }, [isAuthenticated, isRestoring, navigate]);
+  }, [isAuthenticated, loading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,19 +44,6 @@ export const LoginPage = () => {
       }
     }
   };
-
-  if (isRestoring) {
-    return (
-      <div className="auth-page">
-        <Container className="loading-container">
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Восстановление сессии...</span>
-          </Spinner>
-          <p className="mt-3">Восстановление сессии...</p>
-        </Container>
-      </div>
-    );
-  }
 
   return (
     <div className="auth-page">
