@@ -14,7 +14,7 @@ export const COMMANDS_MOCK: Command[] =
       fmt: "rd, rs, imm",
       rs_num: 2,
       rd_num: 1,
-      description: "Выполняет операцию побитового сдвига числа rs на imm позиции вправо, после чего число записывается в rd.",
+      description: "Performs a logical shift on rs, shifting its value by imm to the right. The result is written to rd.",
       img: DefaultImage1
     },
     {
@@ -24,7 +24,7 @@ export const COMMANDS_MOCK: Command[] =
       fmt: "rd, rs, imm",
       rs_num: 2,
       rd_num: 1,
-      description: "Выполняет операцию побитового сдвига числа rs на imm позиции влево, после чего число записывается в rd.",
+      description: "Performs a logical shift on rs, shifting its value by imm to the left. The result is written to rd.",
       img: DefaultImage2
     },
     {
@@ -34,7 +34,7 @@ export const COMMANDS_MOCK: Command[] =
       fmt: "rd, rs, imm",
       rs_num: 1,
       rd_num: 2,
-      description: "Из числа в rs вычитается imm, результат записывается в rd.",
+      description: "Imm is subtracted from rs. The result is written to rd.",
       img: DefaultImage3
     },
     {
@@ -44,7 +44,7 @@ export const COMMANDS_MOCK: Command[] =
       fmt: "rd, rs",
       rs_num: 1,
       rd_num: 2,
-      description: "Биты числа в rs инвертируются, результат записывается в rd.",
+      description: "Bits comprising rs are inverted. The result is written to rd.",
       img: DefaultImage4
     },
     {
@@ -54,7 +54,7 @@ export const COMMANDS_MOCK: Command[] =
       fmt: "rd, rs, imm",
       rs_num: 1,
       rd_num: 2,
-      description: "Побитово производится операция И над числами rs и imm, результат записывается в rd.",
+      description: "A bit-wise AND is performed between rs and imm. The result is written to rd.",
       img: DefaultImage5
     },
   ];

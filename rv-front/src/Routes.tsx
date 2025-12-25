@@ -6,7 +6,8 @@ export const ROUTES = {
   PROGRAMS: "/programs",
   LOGIN: "/log-in",
   REGISTER: "/register",
-  PROFILE: "/profile"
+  PROFILE: "/profile",
+  IMAGE_SEARCH: "/command-img-search"
 }
 export type RouteKeyType = keyof typeof ROUTES;
 export const ROUTE_LABELS: {[key in RouteKeyType]: string} = {
@@ -17,5 +18,6 @@ export const ROUTE_LABELS: {[key in RouteKeyType]: string} = {
   PROGRAMS: "Программы",
   LOGIN: "Авторизация",
   REGISTER: "Регистрация",
-  PROFILE: "Личный кабинет"
+  PROFILE: "Личный кабинет",
+  IMAGE_SEARCH: "Поиск команд по изображению"
 };
