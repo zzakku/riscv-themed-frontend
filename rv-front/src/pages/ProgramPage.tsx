@@ -647,7 +647,6 @@ export const ProgramPage: FC = () => {
       </Container>
 
       {/* Results */}
-      {(adaptedData.program.res_t1 !== null || adaptedData.program.res_t2 !== null) && (
         <Container fluid className="results-section">
           <Row>
             <Col>
@@ -659,7 +658,6 @@ export const ProgramPage: FC = () => {
             </Col>
           </Row>
         </Container>
-      )}
 
       {/* Program Info */}
       <Container fluid className="info-section">
