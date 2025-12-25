@@ -9,7 +9,7 @@ import {
   Spinner
 } from "react-bootstrap";
 import { CommandCard } from "../components/CommandCard";
-import { type Command, getAllCommands } from "../modules/commandsApi";
+import { type Command, getAllCommands, getProgramCartCount } from "../modules/commandsApi";
 import { useNavigate } from "react-router-dom";
 import { ROUTE_LABELS } from "../Routes";
 import { BreadCrumbs } from "../components/BreadCrumbs";
@@ -19,18 +19,12 @@ import { COMMANDS_MOCK } from "../modules/mock";
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { setSearchQuery } from '../store/filterSlice';
 
-interface CommandsPageProps {
-  programID?: string;
-}
-
-export const CommandsPage: FC<CommandsPageProps> = ({  
-  programID = "" 
-}) => {
+export const CommandsPage: FC = () => {
   const [commands, setCommands] = useState<Command[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [cartCount, setCartCount] = useState(0);
-//const [programID, setProgramID] = useState(-1);
+  const [programID, setProgramID] = useState(-1);
 
   const dispatch = useAppDispatch();
   const { searchQuery } = useAppSelector((state) => state.filters)
@@ -95,7 +89,14 @@ export const CommandsPage: FC<CommandsPageProps> = ({
     //try {
     // Вызов API будет здесь позже 
     //}
+    try {
+      const count = await getProgramCartCount();
+      setCartCount(count);
+    } catch (error) {
+      console.error('Error loading cart count:', error);
       setCartCount(0);
+    }
+    setProgramID(-1);
   }
 
   return (

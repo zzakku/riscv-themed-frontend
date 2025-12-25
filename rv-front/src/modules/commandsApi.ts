@@ -133,3 +133,29 @@ export const getAllCommands = async (query?: string): Promise<Command[]> => {
     throw error;
   }
 };
+
+export const getProgramCartCount = async (): Promise<number> => {
+
+  const url = `${API_BASE}/programs/cart-icon`;
+
+  try {
+    let response: Response;
+
+    if (isTauri) {
+      const { fetch: tauriFetch } = await import('@tauri-apps/plugin-http');
+      response = await tauriFetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    }
+    else {response = await fetch(url)};
+    if (!response.ok) throw new Error('API request failed');
+    const data = await response.json();
+    return data.count || 0;
+  } catch (error) {
+    console.warn('Failed to get cart count:', error);
+    return 0;
+  }
+};
