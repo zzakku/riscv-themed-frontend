@@ -2,8 +2,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 // import { VitePWA } from 'vite-plugin-pwa'
 import mkcert from 'vite-plugin-mkcert'
-import fs from 'fs';
-import path from 'path';
+import fs from 'fs'; // убрать при клонировании
+import path from 'path'; // убрать при клонировании
 import { BASE_PATH } from "./src/target_config"
 import { internalIpV4 } from "internal-ip";
 
@@ -50,6 +50,7 @@ export default defineConfig({
       // 3. tell vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
     },
+    // https убрать при клонировании
     https:{
       key: fs.readFileSync(path.resolve(__dirname, 'cert.key')),
       cert: fs.readFileSync(path.resolve(__dirname, 'cert.crt')),
