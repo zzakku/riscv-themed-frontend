@@ -37,12 +37,66 @@ export const ProgramsPage: FC = () => {
   const { cartCount, programId } = useAppSelector((state: RootState) => state.draftProgram);
   const { isAuthenticated, user } = useAppSelector((state: RootState) => state.users);
 
-  // Состояния для фильтров
+  // Функция для получения сегодняшней даты в формате DD.MM.YYYY для API
+  const getTodayFormatted = () => {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    return `${day}.${month}.${year}`;
+  };
+
+  // Функция для преобразования формата DD.MM.YYYY → YYYY-MM-DD (для input type="date")
+  const formatDateForInput = (dateString: string): string => {
+    if (!dateString || dateString === '') return '';
+    
+    // Если уже в формате YYYY-MM-DD
+    if (dateString.includes('-') && dateString.length === 10) {
+      return dateString;
+    }
+    
+    // Преобразуем DD.MM.YYYY в YYYY-MM-DD
+    const parts = dateString.split('.');
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+    
+    return '';
+  };
+
+  // Функция для преобразования формата YYYY-MM-DD → DD.MM.YYYY (для API)
+  const formatDateForApi = (dateString: string): string => {
+    if (!dateString || dateString === '') return '';
+    
+    // Если уже в формате DD.MM.YYYY
+    if (dateString.includes('.') && dateString.length === 10) {
+      return dateString;
+    }
+    
+    // Преобразуем YYYY-MM-DD в DD.MM.YYYY
+    const parts = dateString.split('-');
+    if (parts.length === 3) {
+      const [year, month, day] = parts;
+      return `${day.padStart(2, '0')}.${month.padStart(2, '0')}.${year}`;
+    }
+    
+    return '';
+  };
+
+  // Состояния для фильтров с установкой сегодняшней даты по умолчанию
   const [filters, setFilters] = useState({
     status: '',
-    start_date: '',
-    end_date: '',
+    start_date: formatDateForInput(getTodayFormatted()),
+    end_date: formatDateForInput(getTodayFormatted()),
     creator_login: '' // Новый фильтр по логину создателя
+  });
+
+  // Состояние для хранения фильтров в формате API
+  const [apiFilters, setApiFilters] = useState({
+    status: '',
+    start_date: getTodayFormatted(),
+    end_date: getTodayFormatted()
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,17 +117,11 @@ export const ProgramsPage: FC = () => {
   // Функция для загрузки данных с фильтрами
   const loadPrograms = useCallback(async () => {
     try {
-      // Отправляем только backend фильтры (без creator_login)
-      const backendFilters = {
-        status: filters.status,
-        start_date: filters.start_date,
-        end_date: filters.end_date
-      };
-      await dispatch(getPrograms(backendFilters)).unwrap();
+      await dispatch(getPrograms(apiFilters)).unwrap();
     } catch (err) {
       console.error('Ошибка загрузки программ:', err);
     }
-  }, [dispatch, filters.status, filters.start_date, filters.end_date]);
+  }, [dispatch, apiFilters]);
 
   // Инициализация данных с short polling
   useEffect(() => {
@@ -136,6 +184,16 @@ export const ProgramsPage: FC = () => {
   // Применить фильтры
   const handleApplyFilters = async () => {
     setCurrentPage(1);
+    
+    // Конвертируем фильтры в формат API
+    const newApiFilters = {
+      status: filters.status,
+      start_date: formatDateForApi(filters.start_date),
+      end_date: formatDateForApi(filters.end_date)
+    };
+    
+    setApiFilters(newApiFilters);
+    
     try {
       await loadPrograms();
     } catch (err) {
@@ -145,14 +203,25 @@ export const ProgramsPage: FC = () => {
 
   // Сбросить фильтры
   const handleResetFilters = async () => {
+    const todayFormatted = formatDateForInput(getTodayFormatted());
+    
     const resetFilters = {
       status: '',
-      start_date: '',
-      end_date: '',
+      start_date: todayFormatted,
+      end_date: todayFormatted,
       creator_login: ''
     };
+    
+    const resetApiFilters = {
+      status: '',
+      start_date: getTodayFormatted(),
+      end_date: getTodayFormatted()
+    };
+    
     setFilters(resetFilters);
+    setApiFilters(resetApiFilters);
     setCurrentPage(1);
+    
     try {
       await loadPrograms();
     } catch (err) {
@@ -162,7 +231,7 @@ export const ProgramsPage: FC = () => {
 
   const handleCartClick = () => {
     if (cartCount > 0 && isAuthenticated && programId && programId !== -1) {
-      navigate(ROUTES.PROGRAM.replace(':programId', programId.toString()));
+      navigate(ROUTES.PROGRAM.replace(':id', programId.toString()));
     } else if (isAuthenticated && cartCount === 0) {
       alert("Корзина пуста. Добавьте команды в программу.");
     } else if (!isAuthenticated) {
@@ -227,9 +296,9 @@ export const ProgramsPage: FC = () => {
     const statusMap: Record<string, string> = {
       'черновик': 'Черновик',
       'сформирована': 'Сформирована',
+      'одобрена': 'Одобрена',
       'отклонена': 'Отклонена',
-      'завершена': 'Завершена',
-      'одобрена': 'Одобрена'
+      'завершена': 'Завершена'
     };
     
     return statusMap[status.toLowerCase()] || status;
@@ -275,6 +344,62 @@ export const ProgramsPage: FC = () => {
     }
   };
 
+  // Функция для отображения результата программы
+  const renderProgramResult = (res_t1?: number, res_t2?: number) => {
+    // Проверяем, есть ли результат (не NULL)
+    const hasResult = res_t1 !== null && res_t1 !== undefined && 
+                     res_t2 !== null && res_t2 !== undefined;
+    
+    if (!hasResult) {
+      return (
+        <span className="text-muted fst-italic" style={{ fontSize: '0.9em' }}>
+          Не выполнена
+        </span>
+      );
+    }
+    
+    return (
+      <div className="program-result">
+        <div className="result-values">
+          <Badge bg="secondary" className="me-1">
+            T1: {res_t1}
+          </Badge>
+          <Badge bg="secondary">
+            T2: {res_t2}
+          </Badge>
+        </div>
+      </div>
+    );
+  };
+
+  // Функция для отображения начальных значений
+  const renderInitialValues = (init_t1?: number, init_t2?: number) => {
+    // Проверяем, есть ли начальные значения (не NULL)
+    const hasInitialValues = init_t1 !== null && init_t1 !== undefined && 
+                           init_t2 !== null && init_t2 !== undefined;
+    
+    if (!hasInitialValues) {
+      return (
+        <span className="text-muted fst-italic" style={{ fontSize: '0.9em' }}>
+          Не инициализированы
+        </span>
+      );
+    }
+    
+    return (
+      <div className="initial-values">
+        <div className="init-values">
+          <Badge bg="light" text="dark" className="me-1">
+            T1: {init_t1}
+          </Badge>
+          <Badge bg="light" text="dark">
+            T2: {init_t2}
+          </Badge>
+        </div>
+      </div>
+    );
+  };
+
   // Фильтрация по логину создателя на фронтенде
   const filteredPrograms = Array.isArray(programs) ? programs.filter(program => {
     if (!filters.creator_login) return true;
@@ -299,9 +424,21 @@ export const ProgramsPage: FC = () => {
     } else if (sortConfig.key === 'updated_at') {
       aValue = a.date_update || '';
       bValue = b.date_update || '';
+    } else if (sortConfig.key === 'init_t1') {
+      aValue = a.init_t1 !== null && a.init_t1 !== undefined ? a.init_t1 : -1;
+      bValue = b.init_t1 !== null && b.init_t1 !== undefined ? b.init_t1 : -1;
+    } else if (sortConfig.key === 'init_t2') {
+      aValue = a.init_t2 !== null && a.init_t2 !== undefined ? a.init_t2 : -1;
+      bValue = b.init_t2 !== null && b.init_t2 !== undefined ? b.init_t2 : -1;
     } else if (sortConfig.key === 'creator') {
       aValue = a.creator_login || '';
       bValue = b.creator_login || '';
+    } else if (sortConfig.key === 'result_t1') {
+      aValue = a.res_t1 !== null && a.res_t1 !== undefined ? a.res_t1 : -1;
+      bValue = b.res_t1 !== null && b.res_t1 !== undefined ? b.res_t1 : -1;
+    } else if (sortConfig.key === 'result_t2') {
+      aValue = a.res_t2 !== null && a.res_t2 !== undefined ? a.res_t2 : -1;
+      bValue = b.res_t2 !== null && b.res_t2 !== undefined ? b.res_t2 : -1;
     }
 
     if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
@@ -325,14 +462,15 @@ export const ProgramsPage: FC = () => {
   };
 
   // Проверяем, применены ли какие-либо фильтры
-  const hasActiveFilters = filters.status || filters.start_date || filters.end_date || filters.creator_login;
+  const hasActiveFilters = filters.status || 
+                         (filters.start_date) || 
+                         (filters.end_date) || 
+                         filters.creator_login;
 
-  // Обновляем опции фильтра по статусу
   const statusOptions = [
     { value: '', label: 'Все статусы' },
     { value: 'черновик', label: 'Черновик' },
     { value: 'сформирована', label: 'Сформирована' },
-    { value: 'одобрена', label: 'Одобрена' },
     { value: 'отклонена', label: 'Отклонена' },
     { value: 'завершена', label: 'Завершена' }
   ];
@@ -396,7 +534,7 @@ export const ProgramsPage: FC = () => {
                     <Form.Control 
                       type="date"
                       value={filters.start_date}
-                      onChange={(e) => setFilters(prev => ({ ...prev, start_date: formatDate(e.target.value) }))}
+                      onChange={(e) => setFilters(prev => ({ ...prev, start_date: e.target.value }))}
                     />
                     <Form.Text className="text-muted">
                       Формат: ДД.ММ.ГГГГ
@@ -410,7 +548,7 @@ export const ProgramsPage: FC = () => {
                     <Form.Control 
                       type="date"
                       value={filters.end_date}
-                      onChange={(e) => setFilters(prev => ({ ...prev, end_date: formatDate(e.target.value) }))}
+                      onChange={(e) => setFilters(prev => ({ ...prev, end_date: e.target.value }))}
                     />
                     <Form.Text className="text-muted">
                       Формат: ДД.ММ.ГГГГ
@@ -460,18 +598,6 @@ export const ProgramsPage: FC = () => {
                     </Button>
                   </div>
                   
-                  {/* Индикатор активных фильтров */}
-                  {hasActiveFilters && (
-                    <div className="active-filters-info">
-                      <small className="text-muted">
-                        Активные фильтры: 
-                        {filters.status && ` Статус: ${filters.status}`}
-                        {filters.start_date && ` Дата с: ${filters.start_date}`}
-                        {filters.end_date && ` Дата по: ${filters.end_date}`}
-                        {filters.creator_login && ` Создатель: ${filters.creator_login}`}
-                      </small>
-                    </div>
-                  )}
                 </Col>
               </Row>
             </Card.Body>
@@ -530,6 +656,12 @@ export const ProgramsPage: FC = () => {
                       <th className="sortable" onClick={() => handleSort('creator')}>
                         Автор {renderSortIcon('creator')}
                       </th>
+                      <th className="sortable" onClick={() => handleSort('init_t1')}>
+                        Начальные значения {renderSortIcon('init_t1')}
+                      </th>
+                      <th className="sortable" onClick={() => handleSort('result_t1')}>
+                        Результат {renderSortIcon('result_t1')}
+                      </th>
                       <th>Действия</th>
                     </tr>
                   </thead>
@@ -562,6 +694,12 @@ export const ProgramsPage: FC = () => {
                               </div>
                             )}
                           </td>
+                          <td className="initial-values-cell">
+                            {renderInitialValues(program.init_t1, program.init_t2)}
+                          </td>
+                          <td className="result-cell">
+                            {renderProgramResult(program.res_t1, program.res_t2)}
+                          </td>
                           <td className="actions-cell">
                             <div className="d-flex gap-2">
                               <Button 
@@ -588,7 +726,7 @@ export const ProgramsPage: FC = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={6} className="no-data-cell">
+                        <td colSpan={8} className="no-data-cell">
                           <div className="no-data-content">
                             <h5>Программы не найдены</h5>
                             <p>
@@ -609,7 +747,7 @@ export const ProgramsPage: FC = () => {
                             <Button 
                               variant="outline-primary" 
                               className="ms-2 mt-3"
-                              onClick={() => dispatch(getPrograms(filters))}
+                              onClick={handleApplyFilters}
                             >
                               Обновить
                             </Button>
