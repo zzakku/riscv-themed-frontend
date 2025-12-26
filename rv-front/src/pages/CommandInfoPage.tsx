@@ -3,7 +3,6 @@ import { type FC, useEffect, useState } from "react";
 import { 
   Container, 
   Spinner,
-  Alert,
   Button
 } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
@@ -144,11 +143,6 @@ export const CommandDetailPage: FC = () => {
 
       {/* Command Details */}
       <Container fluid className="command-details-container">
-        {useMockData && (
-          <Alert variant="info" className="mb-4" style={{ maxWidth: '992px', margin: '0 auto' }}>
-            Используются демонстрационные данные
-          </Alert>
-        )}
         
         <div className="command-detail-card">
           {displayCommand.img && (
