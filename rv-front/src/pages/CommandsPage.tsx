@@ -34,7 +34,7 @@ export const CommandsPage: FC = () => {
   // Получаем данные из Redux store
   const { searchQuery } = useAppSelector((state: RootState) => state.filters);
   const { cartCount, programId, loading: draftLoading, error: draftError } = useAppSelector((state) => state.draftProgram);
-  const { commands, loading: commandsLoading, error: commandsError } = useAppSelector((state: RootState) => state.commands);
+  const { commands, loading: commandsLoading } = useAppSelector((state: RootState) => state.commands);
   const { isAuthenticated } = useAppSelector((state: RootState) => state.users);
 
   const [useMockData, setUseMockData] = useState(false);
@@ -146,7 +146,6 @@ export const CommandsPage: FC = () => {
 
   // Определяем какие данные показывать
   const displayCommands = useMockData ? filteredMockCommands : commands;
-  const displayError = useMockData ? "Используются демонстрационные данные" : commandsError;
 
   return (
     <div className="commands-page">
@@ -242,20 +241,6 @@ export const CommandsPage: FC = () => {
 
       {/* Commands Grid */}
       <Container fluid className="commands-container">
-        {displayError && !useMockData && (
-          <Alert variant="warning" className="text-center mb-4">
-            {displayError}
-            <Button 
-              variant="outline-warning" 
-              size="sm" 
-              className="ms-3"
-              onClick={() => setUseMockData(true)}
-            >
-              Использовать демо-данные
-            </Button>
-          </Alert>
-        )}
-
         {loading ? (
           <div className="loading-wrapper">
             <Spinner animation="border" role="status">
