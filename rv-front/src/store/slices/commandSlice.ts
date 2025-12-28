@@ -21,7 +21,7 @@ export const getCommands = createAsyncThunk(
   'commands/getCommands',
   async (filters: { query?: string } = {}, { rejectWithValue }) => {
     try {
-      const response = await api.api.commandsList(filters.query);
+      const response = await api.api.commandsList({searchQuery: filters.query});
       
       // Проверяем структуру ответа API
       if (response.data?.data && Array.isArray(response.data.data)) {

@@ -7,8 +7,7 @@ import {
   Col, 
   Form, 
   Button, 
-  Spinner,
-  Alert
+  Spinner
 } from "react-bootstrap";
 import { CommandCard } from "../components/CommandCard";
 import { CartIcon } from "../components/CartIcon";
@@ -32,21 +31,24 @@ export const CommandsPage: FC = () => {
   const navigate = useNavigate();
   
   // Получаем данные из Redux store
-  const { searchQuery } = useAppSelector((state: RootState) => state.filters);
-  const { cartCount, programId, loading: draftLoading, error: draftError } = useAppSelector((state) => state.draftProgram);
-  const { commands, loading: commandsLoading, error: commandsError } = useAppSelector((state: RootState) => state.commands);
+  const { searchQuery: reduxSearchQuery } = useAppSelector((state: RootState) => state.filters);
+  const { cartCount, programId, loading: draftLoading } = useAppSelector((state) => state.draftProgram);
+  const { commands, loading: commandsLoading } = useAppSelector((state: RootState) => state.commands);
   const { isAuthenticated } = useAppSelector((state: RootState) => state.users);
 
   const [useMockData, setUseMockData] = useState(false);
   const [filteredMockCommands, setFilteredMockCommands] = useState(COMMANDS_MOCK);
   const [addToProgramLoading, setAddToProgramLoading] = useState<number | null>(null);
+  
+  // Локальное состояние для поля поиска
+  const [localSearchQuery, setLocalSearchQuery] = useState(reduxSearchQuery);
 
   // Объединяем состояния загрузки
   const loading = commandsLoading || draftLoading;
 
   useEffect(() => {
-    // Загружаем команды
-    dispatch(getCommands({ query: searchQuery }))
+    // Загружаем команды при первом рендере
+    dispatch(getCommands({ query: reduxSearchQuery }))
       .unwrap()
       .catch((error) => {
         console.error("Ошибка загрузки команд через API:", error);
@@ -57,42 +59,47 @@ export const CommandsPage: FC = () => {
     if (isAuthenticated) {
       dispatch(getDraftProgram());
     }
-  }, [dispatch, searchQuery, isAuthenticated]);
+  }, [dispatch, isAuthenticated]);
 
-  // Фильтрация мок-данных при изменении поискового запроса
+  // Фильтрация мок-данных при использовании моков
   useEffect(() => {
-    if (useMockData && searchQuery) {
-      const filtered = COMMANDS_MOCK.filter((command) =>
-        command.com_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        command.fmt.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredMockCommands(filtered);
-    } else if (useMockData) {
-      setFilteredMockCommands(COMMANDS_MOCK);
+    if (useMockData) {
+      if (reduxSearchQuery) {
+        const filtered = COMMANDS_MOCK.filter((command) =>
+          command.com_name.toLowerCase().includes(reduxSearchQuery.toLowerCase()) ||
+          command.fmt.toLowerCase().includes(reduxSearchQuery.toLowerCase())
+        );
+        setFilteredMockCommands(filtered);
+      } else {
+        setFilteredMockCommands(COMMANDS_MOCK);
+      }
     }
-  }, [searchQuery, useMockData]);
+  }, [reduxSearchQuery, useMockData]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Сохраняем поисковый запрос в Redux store
+    dispatch(setSearchQuery(localSearchQuery));
+    
     if (useMockData) {
       // Фильтрация мок-данных
       const filtered = COMMANDS_MOCK.filter((command) =>
-        command.com_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        command.fmt.toLowerCase().includes(searchQuery.toLowerCase())
+        command.com_name.toLowerCase().includes(localSearchQuery.toLowerCase()) ||
+        command.fmt.toLowerCase().includes(localSearchQuery.toLowerCase())
       );
       setFilteredMockCommands(filtered);
     } else {
       // Поиск через API
-      dispatch(getCommands({ query: searchQuery }))
+      dispatch(getCommands({ query: localSearchQuery }))
         .unwrap()
         .catch((error) => {
           console.error("Ошибка поиска команд:", error);
           setUseMockData(true);
           // Фильтрация мок-данных при ошибке API
           const filtered = COMMANDS_MOCK.filter((command) =>
-            command.com_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            command.fmt.toLowerCase().includes(searchQuery.toLowerCase())
+            command.com_name.toLowerCase().includes(localSearchQuery.toLowerCase()) ||
+            command.fmt.toLowerCase().includes(localSearchQuery.toLowerCase())
           );
           setFilteredMockCommands(filtered);
         });
@@ -146,7 +153,6 @@ export const CommandsPage: FC = () => {
 
   // Определяем какие данные показывать
   const displayCommands = useMockData ? filteredMockCommands : commands;
-  const displayError = useMockData ? "Используются демонстрационные данные" : commandsError;
 
   return (
     <div className="commands-page">
@@ -182,8 +188,8 @@ export const CommandsPage: FC = () => {
                 <div className="search-input-container">
                   <Form.Control
                     type="text"
-                    value={searchQuery}
-                    onChange={(e) => dispatch(setSearchQuery(e.target.value))}
+                    value={localSearchQuery}
+                    onChange={(e) => setLocalSearchQuery(e.target.value)}
                     placeholder="Поиск команд"
                     className="custom-search-input mag-glass"
                     disabled={loading}
@@ -236,25 +242,6 @@ export const CommandsPage: FC = () => {
 
       {/* Commands Grid */}
       <Container fluid className="commands-container">
-        {displayError && !useMockData && (
-          <Alert variant="warning" className="text-center mb-4">
-            {displayError}
-            <Button 
-              variant="outline-warning" 
-              size="sm" 
-              className="ms-3"
-              onClick={() => setUseMockData(true)}
-            >
-              Использовать демо-данные
-            </Button>
-          </Alert>
-        )}
-
-        {draftError && (
-          <Alert variant="danger" className="mb-3">
-            Ошибка загрузки корзины: {draftError}
-          </Alert>
-        )}
 
         {loading ? (
           <div className="loading-wrapper">

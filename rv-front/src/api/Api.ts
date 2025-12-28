@@ -96,6 +96,13 @@ export interface HandlerRegisterRequest {
   password: string;
 }
 
+export interface HandlerRiscvCallbackRequest {
+  program_id?: number;
+  res_t1?: number;
+  res_t2?: number;
+  status?: string;
+}
+
 export interface HandlerSuccessCartResp {
   data?: HandlerProgramCartResp;
   status?: string;
@@ -335,10 +342,17 @@ export class Api<
      * @summary Получить все команды
      * @request GET:/api/commands
      */
-    commandsList: (query?: string, params: RequestParams = {}) =>
+    commandsList: (
+      query?: {
+        /** поисковый запрос */
+        searchQuery?: string;
+      },
+      params: RequestParams = {},
+    ) =>
       this.request<HandlerSuccessResponse, HandlerErrorResponse>({
         path: `/api/commands`,
         method: "GET",
+        query: query,
         format: "json",
         ...params,
       }),
@@ -483,6 +497,28 @@ export class Api<
       this.request<HandlerSuccessResponse, void | HandlerErrorResponse>({
         path: `/api/commands/${id}/add-to-program`,
         method: "POST",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Принимает результаты выполнения программы от RISC-V сервиса
+     *
+     * @tags internal
+     * @name InternalProgramsCallbackUpdate
+     * @summary Callback от RISC-V сервиса
+     * @request PUT:/api/internal/programs/{id}/callback
+     */
+    internalProgramsCallbackUpdate: (
+      id: number,
+      body: HandlerRiscvCallbackRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<HandlerSuccessResponse, HandlerErrorResponse>({
+        path: `/api/internal/programs/${id}/callback`,
+        method: "PUT",
+        body: body,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),
