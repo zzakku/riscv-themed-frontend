@@ -67,7 +67,6 @@ export const Navigation: FC = () => {
             <div className='nav__links'>
               <NavLink to='/' className='nav__link'>Главная</NavLink>
               <NavLink to='/commands' className='nav__link'>Команды</NavLink>
-            <NavLink to='/command-img-search' className='nav__link'>ИИ-поиск</NavLink>
               
               {isAuthenticated && (
                 <NavLink to='/programs' className='nav__link'>Программы</NavLink>

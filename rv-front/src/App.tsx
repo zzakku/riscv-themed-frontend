@@ -11,7 +11,6 @@ import ProgramPage from './pages/ProgramPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import { ProgramsPage } from './pages/ProgramsPage';
-import CommandImageSearchPage from './pages/CommandImageSearchPage';
 
 const App: FC = () => {
   return (
@@ -26,7 +25,6 @@ const App: FC = () => {
           <Route path={ROUTES.LOGIN} element={<LoginPage />} />
           <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
           <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
-          <Route path={ROUTES.IMAGE_SEARCH} element={<CommandImageSearchPage />} />
         </Routes>
       </div>
     </BrowserRouter>
